@@ -1,0 +1,49 @@
+{:linters
+ {:unused-namespace
+  {:exclude [common.types
+             crafter
+             react]}
+
+  :unresolved-namespace
+  {:exclude [shadow.cljs.devtools.server.runtime
+             shadow.cljs.devtools.server.worker
+             shadow.cljs.devtools.server.supervisor
+             shadow.cljs.devtools.api
+             web.shadow]}
+
+  :unresolved-symbol
+  {:exclude [(meander.epsilon/find)
+             (meander.epsilon/search)
+             (meander.epsilon/match)
+             (meander.epsilon/rewrite)
+             (meander.strategy.epsilon/find)
+             (meander.strategy.epsilon/match)
+             (meander.strategy.epsilon/rewrite)]}
+
+  :unsorted-required-namespaces
+  {:level :warning}
+
+  :type-mismatch
+  {:level :warning}}
+
+ :hooks
+ {:analyze-call {foundation.react/prop hooks.react/prop}}
+
+ :lint-as
+ {factor.examples/defexample             clojure.core/def
+  factor.types/def                       clojure.spec.alpha/def
+  factor.types/defn                      clojure.core/defn
+  factor.types/defn-                     clojure.core/defn-
+  com.tekacs.defcards/defcard            clj-kondo.lint-as/def-catch-all
+  crafter.macros/deferror                clojure.core/def
+  foundation.hooks/defcontext            clojure.core/def
+  foundation.icons/deficon               clojure.core/def
+  foundation.react/defnc                 clojure.core/defn
+  helix.core/defnc                       clojure.core/defn
+  mount.core/defstate                    clojure.core/def
+  com.wsscode.pathom.connect/defresolver clojure.core/defn
+  com.wsscode.pathom.connect/defmutation clojure.core/defn
+  instaparse.core/defparser              clojure.core/def
+  common.schema/defenum                  clojure.core/def
+  promesa.core/let                       clojure.core/let
+  common.db.macros/defdbfn               clojure.core/defn}}
