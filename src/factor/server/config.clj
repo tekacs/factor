@@ -2,6 +2,11 @@
   (:require [factor.config]
             [integrant.core :as ig]))
 
+(def repl
+  {:factor.server.repl/nrepl-server
+   {:host nil
+    :port nil}})
+
 (def sente
   {:factor.server.sente/server-options
    {:user-id-fn nil}
@@ -43,4 +48,4 @@
     :handler (ig/ref :factor.server.routing/handle)}})
 
 (def template
-  (merge sente routing http))
+  (merge repl sente routing http))
