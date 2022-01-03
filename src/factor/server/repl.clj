@@ -66,20 +66,4 @@
   (ir/reset))
 
 (defn reset-all []
-  (ir/reset-all))  
-
-(comment
-  (defmethod ig/init-key :factor/context [_ _] {})
-  (require 'factor.server.config)
-  (set-prep!
-   (fn []
-     (assoc factor.server.config/template
-            :factor/context {}
-            ::nrepl-server {:host "127.0.0.1" :port 2627})))
-  (load-namespaces)
-  (go)
-  (halt)
-  (reset-all)
-  config
-  system
-  )
+  (ir/reset-all))
