@@ -1,9 +1,7 @@
 (ns factor.system
-  (:require [aero.core :as aero]
-            [clojure.string :as string]
-            [factor.config :as config]
+  (:require #?(:cljs [aero.core :as aero])
+            #?(:cljs [clojure.string :as string])
             [factor.types :as ty]
-            [malli.core :as m]
             [integrant.core :as ig]))
 
 (ty/def ::profile
@@ -15,7 +13,7 @@
    #?(:clj nil :cljs (some-> (aero/get-env "NODE_ENV") string/lower-case keyword))))
 
 (defmethod ig/init-key ::profile [_ profile]
-  (ty/assert-valid ::profile (str "Started with an invalid " ::profile) :dev))
+  (ty/assert-valid ::profile (str "Started with an invalid " ::profile) profile))
 
 (defn dev?
   [{::keys [profile] :as _system}]
