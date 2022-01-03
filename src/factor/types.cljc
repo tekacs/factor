@@ -13,6 +13,7 @@
             [lambdaisland.regal :as regal]
             [lambdaisland.regal.generator :as regal-gen]
             [malli.core :as m]
+            [malli.error :as me]
             [malli.generator :as mg]
             [malli.impl.util :as miu]
             [malli.registry :as mr]
@@ -20,6 +21,19 @@
   #?(:clj (:import (clojure.lang IAtom))))
 
 (def => :ret)
+
+(clojure.core/defn assert-valid
+  [type error-message value]
+  (if (m/validate type value)
+    value
+    (let [explain (m/explain type value)]
+      (throw (ex-info error-message {:type type :value value :explain explain :humanize (me/humanize explain)})))))
+
+(clojure.core/defn local-registry
+  [registry]
+  (mr/composite-registry
+    registry
+    (m/default-schemas)))
 
 (clojure.core/defn exception-safe-fn
   [function fallback-fn]
@@ -122,9 +136,9 @@
         validator (m/validator ret)
         explainer (m/explainer ret)]
     (m/-simple-schema
-      {:type            [args ret]
-       :pred            #(->> (mg/generate generator) (apply %) (validator))
-       :type-properties {:error/fn (fn [{:keys [value]} _] (->> (mg/generate generator) (apply value) (explainer)))}})))
+     {:type            [args ret]
+      :pred            #(->> (mg/generate generator) (apply %) (validator))
+      :type-properties {:error/fn (fn [{:keys [value]} _] (->> (mg/generate generator) (apply value) (explainer)))}})))
 
 #?(:cljs
    (clojure.core/defn randexp-seeded [regex]
@@ -136,9 +150,9 @@
 (clojure.core/defn regex-gen [regex]
   #?(:clj (mg/generator [:re regex])
      :cljs (gen/fmap
-             (comp
-               #(.gen ^js %)
-               (randexp-seeded regex)) (gen/choose js/Number.MIN_SAFE_INTEGER js/Number.MAX_SAFE_INTEGER))))
+            (comp
+             #(.gen ^js %)
+             (randexp-seeded regex)) (gen/choose js/Number.MIN_SAFE_INTEGER js/Number.MAX_SAFE_INTEGER))))
 
 (clojure.core/defn re
   ([regex] (re {} regex))
@@ -153,18 +167,18 @@
       (regal/regex regal-expr)])))
 
 (register! ::atom-of (transform-type
-                       ::atom-of
-                       (constantly deref)
-                       (constantly atom)
-                       (fn [_ children _] (first children))))
+                      ::atom-of
+                      (constantly deref)
+                      (constantly atom)
+                      (fn [_ children _] (first children))))
 
 (register! ::instance (m/-simple-schema
-                        (fn [_ [class]]
-                          {:type            ::instance
-                           :type-properties {:error/message (str "Should be an instance of " (pr-str class))}
-                           :pred            #(instance? class %)
-                           :min             1
-                           :max             1})))
+                       (fn [_ [class]]
+                         {:type            ::instance
+                          :type-properties {:error/message (str "Should be an instance of " (pr-str class))}
+                          :pred            #(instance? class %)
+                          :min             1
+                          :max             1})))
 
 (register! ::derived-from (m/-simple-schema
                            (fn [_ [parent]]
@@ -209,10 +223,10 @@
 
 (def registry
   (mr/composite-registry
-    (m/default-schemas) ; This can be reduced for DCE in future if desired.
-    (mu/schemas)
-    (mr/mutable-registry registry$)
-    (mr/dynamic-registry)))
+   (m/default-schemas) ; This can be reduced for DCE in future if desired.
+   (mu/schemas)
+   (mr/mutable-registry registry$)
+   (mr/dynamic-registry)))
 
 (mr/set-default-registry! registry)
 
@@ -224,11 +238,11 @@
   spec)
 
 (defmacro defn
-  {:arglists '([name doc-string? attr-map? [params*] [schemas*]? body])}
+  {:arglists '([name doc-string? attr-map? [params*] [schemas*] ? body])}
   [& args]
   `(av/>defn ~@args))
 
 (defmacro defn-
-  {:arglists '([name doc-string? attr-map? [params*] [schemas*]? body])}
+  {:arglists '([name doc-string? attr-map? [params*] [schemas*] ? body])}
   [& args]
   `(av/>defn- ~@args))

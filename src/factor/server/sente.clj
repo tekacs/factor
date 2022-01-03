@@ -43,13 +43,16 @@
   ignored-keepalive [_ _]
   "This is just a keepalive message")
 
+(defmethod ig/prep-key ::server-options [_ config]
+  (update config :user-id-fn #(or % :session-id)))
+
 ;; The default user-id is extracted from Ring parameters, as sent by client.sente.
 ;; To extract the user-id in a different way, just redefine this defmethod downstream.
 (defmethod ig/init-key ::server-options
-  server-options [_ {:keys [user-id]}]
+  server-options [_ {:keys [user-id-fn]}]
   {:csrf-token-fn nil
    :packer        packer
-   :user-id-fn    (fn [req] (some-> (get-in req [:params user-id]) (UUID/fromString)))})
+   :user-id-fn    (fn [req] (some-> req :params user-id-fn (UUID/fromString)))})
 
 ;; The actual sente server.
 (defmethod ig/init-key ::server [_ {:keys [options]}]
