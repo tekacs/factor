@@ -17,11 +17,33 @@
 (def preparer irs/preparer)
 (metaprogramming/link-vars #'irs/preparer #'preparer)
 
+(defn prep []
+  (ir/prep))
+
+(defn go []
+  (ir/go))
+
+(defn halt []
+  (ir/halt))
+
+(defn suspend []
+  (ir/suspend))
+
+(defn resume []
+  (ir/resume))
+
+(defn reset []
+  (ir/reset))
+
+(defn reset-all []
+  (ir/reset-all))  
+
 (comment
   (defmethod ig/init-key :factor/context [_ _] {})
   (set-prep! (fn [] (assoc factor.server.config/template :factor/context {})))
-  (ir/go)
-  (ir/halt)
+  (go)
+  (halt)
+  (reset-all)
   config
   system
   )
