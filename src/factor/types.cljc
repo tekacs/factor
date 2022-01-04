@@ -144,20 +144,20 @@
   [& args]
   `(av/>defn- ~@args))
 
-(def ::instance
-  (m/-simple-schema
-   (fn [_ [class]]
-     {:type            ::instance
-      :type-properties {:error/message (str "Should be an instance of " (pr-str class))}
-      :pred            #(instance? class %)
-      :min             1
-      :max             1})))
+(register! ::instance
+           (m/-simple-schema
+            (fn [_ [class]]
+              {:type            ::instance
+               :type-properties {:error/message (str "Should be an instance of " (pr-str class))}
+               :pred            #(instance? class %)
+               :min             1
+               :max             1})))
 
-(def ::derived-from
-  (m/-simple-schema
-   (fn [_ [parent]]
-     {:type            ::derived-from
-      :type-properties {:error/message (str "Should be derived from " (pr-str parent))}
-      :pred            #(isa? % parent)
-      :min             1
-      :max             1})))
+(register! ::derived-from
+           (m/-simple-schema
+            (fn [_ [parent]]
+              {:type            ::derived-from
+               :type-properties {:error/message (str "Should be derived from " (pr-str parent))}
+               :pred            #(isa? % parent)
+               :min             1
+               :max             1})))
