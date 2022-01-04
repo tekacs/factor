@@ -1,16 +1,9 @@
 (ns factor.client.react
-  {:client/npm-deps ["react" "react-dom" "react-error-boundary"]}
+  {:client/npm-deps ["react" "react-dom"]}
   (:require ["react" :as react]
             ["react-dom" :as react-dom]
-            ["react-error-boundary"
-             :refer
-             [ErrorBoundary]
-             :rename
-             {ErrorBoundary REB}]
             [com.tekacs.access :as a]
             [factor.client.types :as fct]
-            [factor.debugging :as debugging]
-            [factor.errors :as errors]
             [factor.types :as ty]
             [helix.children :as helix-children]
             [helix.core]
@@ -28,26 +21,6 @@
 
 (defmulti props-spec (fn [type_] type_))
 (defmulti props-explainer (fn [type_] type_))
-
-(prop ErrorFallback [:map
-                     [:error ::errors/error]
-                     [:componentStack ::child]
-                     [:resetErrorBoundary ifn?]])
-(defnc ErrorFallback [{:keys [error componentStack resetErrorBoundary]}]
-  (js/console.log error)
-  ($ :div ["p-2-safe flex flex-col"]
-     ($ :a {:on-click resetErrorBoundary} "Reset")
-     ($ :br)
-     ($ :div
-        ($ :div ["font-mono whitespace-pre-wrap"] "message:\n" (ex-message error))
-        ($ :br)
-        ($ :div ["font-mono whitespace-pre-wrap"] "data:\n" (debugging/fprint-str (ex-data error)))
-        ($ :br)
-        ($ :div ["font-mono whitespace-pre-wrap"] "component stack:" componentStack))))
-
-(prop ErrorBoundary)
-(defnc ErrorBoundary [{:keys [children]}]
-  ($ REB {:FallbackComponent ErrorFallback} children))
 
 (defn render [root component]
   (a/call! react-dom :render component root))
