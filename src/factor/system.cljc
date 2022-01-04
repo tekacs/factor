@@ -145,7 +145,8 @@
 
 (defn hard-reset []
   (halt)
-  (go))
+  #?(:clj (do (tnr/clear) (tnr/refresh-all :after 'factor.system/go))
+     :cljs (go)))
 
 (defn load-namespaces []
   (prep)

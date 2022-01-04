@@ -33,6 +33,9 @@
   ;; Suspend, reload every namespace possible on disk using t.n.repl and then Resume.
   (system/reset-all)
 
+  ;; Hard reset the system
+  (system/hard-reset)
+
   ;; The current system config is in `system.state/config` -- may contain secrets in production!
   state/config
 
