@@ -45,8 +45,7 @@
  :aliases
  {:http {:main-opts ["-m" "http"]}
 
-  :server {:extra-paths ["server"]
-           :extra-deps {integrant/repl             {:mvn/version "0.3.2"}
+  :server {:extra-deps {integrant/repl             {:mvn/version "0.3.2"}
 
                         http-kit/http-kit          {:mvn/version "2.5.1"}
 
@@ -60,8 +59,7 @@
                         amazonica/amazonica        {:mvn/version "0.3.153"}}
            :jvm-opts ["-Dmalli.registry/type=custom"]}
 
-  :client {:extra-paths ["client"]
-           :extra-deps {org.clojure/clojurescript  {:mvn/version "1.10.866"}
+  :client {:extra-deps {org.clojure/clojurescript  {:mvn/version "1.10.866"}
 
                         com.tekacs/access          {:mvn/version "1.0.2"}
 
