@@ -1,5 +1,7 @@
 (ns factor.debugging
-  (:require [factor.types :as ty :refer [=>]]
+  (:require #?(:cljs [clojure.string :as string])
+            #?(:cljs [factor.browser :as browser])
+            [factor.types :as ty :refer [=>]]
             [fipp.edn :as fipp]))
 
 (ty/defn fprint-str
@@ -9,3 +11,16 @@
 (ty/defn fprint
   [value] [any? => nil?]
   (println (fprint-str value)))
+
+#?(:cljs
+   (defn log-group
+     [_level title & args]
+     (let [stringify-if-not-chrome (if (= (browser/browser-name) :chrome) identity #(-> % str string/trim))]
+       (apply js/console.groupCollapsed (map stringify-if-not-chrome title))
+       (apply js/console.log (map stringify-if-not-chrome args))
+
+       (js/console.groupCollapsed "trace")
+       (js/console.trace)
+       (js/console.groupEnd)
+
+       (js/console.groupEnd))))

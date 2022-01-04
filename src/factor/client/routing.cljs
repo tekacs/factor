@@ -8,12 +8,15 @@
             [clojure.string :as string]
             [cognitect.transit :as transit]
             [com.tekacs.access :as a]
-            #_ [factor.client.components.alert :as alert]
+            #_[factor.client.components.alert :as alert]
             [factor.client.react :as react :refer [$ defnc prop]]
             [factor.client.types :as fct]
             [factor.types :refer [=>] :as ty]
             [goog.Uri :as uri]
             [malli.core :as m]))
+
+(defonce transit-writer (transit/writer :json))
+(defonce transit-reader (transit/reader :json))
 
 (ty/def ::location
   [:map
@@ -119,7 +122,7 @@
 (ty/defn use-location
   [] [=> ::location]
   (let [{:keys [state] :as location} (->clj (useLocation))]
-    (assoc location :state (when state (try (transit/read fu/transit-reader state)
+    (assoc location :state (when state (try (transit/read transit-reader state)
                                             (catch :default _ state))))))
 
 (ty/defn use-state
@@ -165,11 +168,18 @@
 (defnc Route [{:keys [path] :as props}]
   ($ RRoute {:path (->js path) :& (dissoc props :path)}))
 
+(ty/defn location->path
+  [location] [::location => :string]
+  (let [{:keys [pathname search hash]} location
+        search                         (if (= \? (first search)) (subs search 1) search)
+        hash                           (if (= \# (first hash)) (subs hash 1) hash)]
+    (cond-> pathname (seq search) (str "?" search) (seq hash) (str "#" hash))))
+
 (defn navigate!
   ([history route] (navigate! history route {}))
   ([history route {:keys [replace?]}]
    (let [[_ _ state] route
-         state       (transit/write fu/transit-writer state)
+         state       (transit/write transit-writer state)
          path        (cond
                        (string? route) route
                        (vector? route) (path-for route))]
@@ -189,13 +199,6 @@
   (let [uri (if (string? uri) (uri/parse uri) uri)]
     (or (get fconfig/our-domains (.getDomain uri))
         (.hasSameDomainAs ^js uri (uri/parse js/document.location)))))
-
-(ty/defn location->path
-  [location] [::location => :string]
-  (let [{:keys [pathname search hash]} location
-        search                         (if (= \? (first search)) (subs search 1) search)
-        hash                           (if (= \# (first hash)) (subs hash 1) hash)]
-    (cond-> pathname (seq search) (str "?" search) (seq hash) (str "#" hash))))
 
 (defn navigate-to-internal-href!
   [history href]

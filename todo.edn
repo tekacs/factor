@@ -1,3 +1,4 @@
+[! factor.client.routing "provide a way of identifying 'our domains' to allow our-origin? and therefore navigate-to-internal-href! to work"]
 [factor.server.repl "pull out integrant.repl.state aspects for use in production (non-REPL) too"]
 [factor.config factor.server.example "better way to 'require' app-provided DI/config"]
 [factor.secrets "a way to read in secrets"]

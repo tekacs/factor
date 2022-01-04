@@ -70,15 +70,3 @@
          :use-async/error  error
       ;; For backwards compatibility with uses in static.contentful, which can be rewritten later.
          :value            value}))))
-
-#?(:cljs
-   (defn use-channel
-     ([ch init] (use-channel ch init {}))
-     ([ch init {:keys [close?]}]
-      (let [[state set-state] (hook/use-state init)
-            deps              [ch set-state close?]
-            effect-fn
-            #(let [!shutdown (async/reaction-loop ch set-state {:close? close?})]
-               (fn [] (y/close! !shutdown)))]
-        (hook/use-effect* effect-fn deps)
-        state))))

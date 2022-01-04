@@ -1,5 +1,5 @@
 (ns factor.client.react.errors
-  {:npm-deps["react-error-boundary"]}
+  {:client/npm-deps ["react-error-boundary"]}
   (:require ["react-error-boundary" :refer [ErrorBoundary] :rename {ErrorBoundary REB}]
             [factor.debugging :as debugging]
             [factor.errors :as errors]

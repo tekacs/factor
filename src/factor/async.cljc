@@ -4,6 +4,7 @@
             #?(:clj [clojure.core.async.impl.protocols]
                :cljs [cljs.core.async.impl.protocols])
             [factor.types :as ty]
+            #?(:cljs [helix.hooks :as hook])
             [promesa.core :as pc]))
 
 ;; TODO: Effect handling here could be well-approached using a >defn-go macro:
@@ -75,3 +76,15 @@
         good (f good)
         bad  (err-f bad))))
   nil)
+
+#?(:cljs
+   (defn use-channel
+     ([ch init] (use-channel ch init {}))
+     ([ch init {:keys [close?]}]
+      (let [[state set-state] (hook/use-state init)
+            deps              [ch set-state close?]
+            effect-fn
+            #(let [!shutdown (reaction-loop ch set-state {:close? close?})]
+               (fn [] (y/close! !shutdown)))]
+        (hook/use-effect* effect-fn deps)
+        state))))
