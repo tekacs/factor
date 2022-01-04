@@ -36,8 +36,8 @@
           %)])
 
 (ty/def ::promise
-  #?(:clj [:fn #(satisfies? java.util.concurrent.CompletableFuture)]
-     :cljs [:schema :foundation.promises/promise]))
+  #?(:clj [:fn #(satisfies? java.util.concurrent.CompletableFuture %)]
+     :cljs [:schema :factor.promises/promise]))
 
 (defn reaction-loop
   ([ch handler] (reaction-loop ch handler {}))

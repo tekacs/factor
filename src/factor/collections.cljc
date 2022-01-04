@@ -4,7 +4,7 @@
             [taoensso.encore :as encore]))
 
 (ty/defn positions
-  [pred coll] [::ty/fn [:sequential any?] => [:sequential int?]]
+  [pred coll] [ifn? [:sequential any?] => [:sequential int?]]
   (keep-indexed
    (fn [idx v] (when (pred v) idx))
    coll))
@@ -12,7 +12,7 @@
 (comment (positions even? [1 2 3 4 5]) => '(1 3))
 
 (ty/defn sole-index-of
-  [pred coll] [::ty/fn [:sequential any?] => [:maybe int?]]
+  [pred coll] [ifn? [:sequential any?] => [:maybe int?]]
   (let [pos (positions pred coll)]
     (case (count pos)
       0 nil
@@ -43,7 +43,7 @@
   (last (rest-before pred coll)))
 
 (ty/defn distinct-by
-  [into-coll keyfn coll] [coll? ::ty/fn coll? => coll?]
+  [into-coll keyfn coll] [coll? ifn? coll? => coll?]
   (into into-coll (encore/xdistinct keyfn) coll))
 
 (defn remove-at-index

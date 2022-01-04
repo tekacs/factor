@@ -1,5 +1,9 @@
 (ns factor.bytes
-  #?(:clj (:import java.nio.charset.Charset)))
+  #?(:clj (:import java.nio.charset.Charset))
+  (:require [factor.types :as ty]))
+
+(ty/def ::bytes
+  #?(:clj bytes? :cljs string?))
 
 #?(:clj
    (def ^:private ^Charset utf-8

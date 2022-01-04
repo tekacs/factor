@@ -1,0 +1,51 @@
+{:deps
+ {:aliases [:client]}
+
+ :nrepl
+ {:port       8230
+  :middleware [refactor-nrepl.middleware/wrap-refactor]}
+
+ :http
+ {:host "0.0.0.0"
+  :port 9898}
+
+ :dev-http
+ {3000
+  {:host "0.0.0.0"
+   :root "build/dev"
+   :handler factor.client.example/repl-http-handler}}
+
+ ;; :ssl
+ ;; {:keystore "ssl/origin.jks"
+ ;;  :password "shadow-cljs"}
+
+ ;; :closure-defines
+ ;; {"shadow.cljs.devtools.client.env.ssl" true}
+
+ :fs-watch {:hawk false}
+
+ :builds
+ {:example
+  {:target           :browser
+   :output-dir       "build/dev/js"
+   :asset-path       "/js"
+   :compiler-options {:parallel-build true
+                      :infer-externs  :auto}
+   :module-loader    true
+   :modules          {:factor {:entries [factor.client.example]}}
+   :closure-defines  {malli.registry/type "custom"}
+   :dev              {:compiler-options {:output-feature-set :es8
+                                         :external-config
+                                         {:devtools/config
+                                          {:features-to-install [:formatters :hints]}}}}
+   :release          {:compiler-options {:output-feature-set :es8
+                                         ;; This has (at the time of writing) a 3x impact on the size of the build.
+                                         ;; It's super valuable for debugging, but should be turned off at some point.
+                                         :pseudo-names       true}
+                      :output-dir       "build/release/"}
+   :devtools         {:log                   false
+                      :reload-strategy       :full
+                      :use-document-protocol true
+                      :preloads              [factor.client.preload
+                                              sci.core
+                                              shadow.remote.runtime.cljs.browser]}}}}

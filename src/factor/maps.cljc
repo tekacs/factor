@@ -5,11 +5,11 @@
   (if (some? value) (assoc m key value) m))
 
 (ty/defn map-map
-  [m map-fn] [map? ::ty/fn => map?]
+  [m map-fn] [map? ifn? => map?]
   (->> m (map (fn [[k v]] (map-fn k v))) (into {})))
 
 (ty/defn filter-map
-  [m filter-fn] [map? ::ty/fn => map?]
+  [m filter-fn] [map? ifn? => map?]
   (->> m (filter (fn [[k v]] (filter-fn k v))) (into {})))
 
 (ty/defn compact-map

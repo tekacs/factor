@@ -4,3 +4,5 @@
 [factor.server.pathom "built-in support for Pathom"]
 [factor.client.sente "client-side support for Sente"]
 [factor.client.pathom "built-in support for Pathom"]
+[factor.types "split type definitions into domain-specific namespaces"]
+[factor.client.types factor.client.dom "split type definitions into domain-specific namespaces, like factor.client.dom"]

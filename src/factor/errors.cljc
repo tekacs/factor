@@ -21,11 +21,14 @@
    [:error/public? {:optional true}]
    [:error/message {:optional true}]
    [:error/client-facing-id {:optional true}]
-   
+
    [::ty/actual {:optional true} :any]
    [::ty/expected {:optional true} :any]
    [::ty/explanation {:optional true} [:or :map :string]]
    [::ty/humanized {:optional true} :string]])
+
+(def ::exception
+  [::instance #?(:clj Throwable :cljs js/Error)])
 
 (ty/defn error?
   "Is this value an error?"
@@ -40,7 +43,7 @@
 (ty/defn expect
   "... read the function definition to understand how this one works"
   [error-types expected-fn fallback-fn]
-  [[:set :error/type] ::ty/fn ::ty/fn => ::ty/fn]
+  [[:set :error/type] ifn? ifn? => ifn?]
   (fn [errors]
     (let [[expected remaining] ((juxt filter remove) #(error-types (:error/type %)) errors)]
       (when (and expected-fn (seq expected)) (expected-fn expected))
@@ -62,7 +65,7 @@
 
 (ty/defn secret-error
   "Create an error map that will never reach the client"
-  [error-type ex] [:error/type ::ty/exception => ::error]
+  [error-type ex] [:error/type ::exception => ::error]
   {:error/id (log-exception (identifiers/random-uuid) ex)
    :error/type error-type})
 
@@ -79,9 +82,9 @@
 
 (ty/defn error->exception
   "Turn an error map into a throwable exception."
-  ([error] [::error => ::ty/exception] (error->exception error nil))
+  ([error] [::error => ::exception] (error->exception error nil))
   ([error cause]
-   [::error [:maybe ::ty/exception] => ::ty/exception]
+   [::error [:maybe ::exception] => ::exception]
    (if (some? cause)
      (ex-info "" error cause)
      (ex-info "" error))))

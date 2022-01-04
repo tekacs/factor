@@ -2,6 +2,6 @@
   (:require [factor.types :as ty :refer [=>]]))
 
 (ty/defn discard-args
-  [f] [::ty/fn => ::ty/fn]
+  [f] [ifn? => ifn?]
   (fn [& _]
     (f)))

@@ -30,3 +30,11 @@
   (= (idents/ident->dotted-form ns) (namespace kwd)))
 
 (comment (is-namespaced? :parent/namespace :parent.namespace/keyword) => true)
+
+(ty/def ::unqualified-keyword
+  [:and
+   keyword?
+   [:fn {:error/message "keyword should be unqualified"}
+    #(nil? (namespace %))]
+   [:fn {:error/message "keyword should have a non-empty name"}
+    #(not-empty (name %))]])

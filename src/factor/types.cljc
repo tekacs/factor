@@ -3,10 +3,7 @@
   {:require-as 'ty}
   (:refer-clojure :exclude [defn defn-])
   #?(:cljs (:require-macros [factor.types]))
-  (:require #?(:cljs ["randexp" :as randexp])
-            #?(:cljs ["random-seed" :as random-seed])
-            #?(:cljs [com.tekacs.access :as a])
-            [aave.code]
+  (:require [aave.code]
             [aave.core :as av]
             [clojure.test.check.generators :as gen]
             [factor.types.state :refer [registry$]]
@@ -32,8 +29,8 @@
 (clojure.core/defn local-registry
   [registry]
   (mr/composite-registry
-    registry
-    (m/default-schemas)))
+   registry
+   (m/default-schemas)))
 
 (clojure.core/defn exception-safe-fn
   [function fallback-fn]
@@ -121,106 +118,6 @@
           (-parent [this] (transform-type type mapper gen-mapper underlying-type))
           (-form [this] (m/-create-form type properties children)))))))
 
-(clojure.core/defn fspec
-  "This is a placeholder for a real fspec function once it's added by malli"
-  [& {:keys [args ret] :as spec}]
-  (when-let [failure (m/explain [:map [:args [:vector any?]] [:ret any?]] spec)]
-    (println failure)
-    (throw (ex-info "Must provide both :args and :ret to fspec" failure)))
-  [:fn {:error/message (str "should be a function taking " args " and returning " ret)} fn?])
-
-(clojure.core/defn fspec!
-  "THIS CALLS THE FUNCTION UNDER VALIDATION!"
-  [& {:keys [args ret]}]
-  (let [generator (mg/generator (into [:tuple] args))
-        validator (m/validator ret)
-        explainer (m/explainer ret)]
-    (m/-simple-schema
-     {:type            [args ret]
-      :pred            #(->> (mg/generate generator) (apply %) (validator))
-      :type-properties {:error/fn (fn [{:keys [value]} _] (->> (mg/generate generator) (apply value) (explainer)))}})))
-
-#?(:cljs
-   (clojure.core/defn randexp-seeded [regex]
-     (fn [seed]
-       (let [underlying (randexp. regex)]
-         (a/assoc! underlying :randInt (a/get (random-seed. seed) :intBetween))
-         underlying))))
-
-(clojure.core/defn regex-gen [regex]
-  #?(:clj (mg/generator [:re regex])
-     :cljs (gen/fmap
-            (comp
-             #(.gen ^js %)
-             (randexp-seeded regex)) (gen/choose js/Number.MIN_SAFE_INTEGER js/Number.MAX_SAFE_INTEGER))))
-
-(clojure.core/defn re
-  ([regex] (re {} regex))
-  ([props regex] [:re (merge {:gen/gen (regex-gen regex)} props) regex]))
-
-(clojure.core/defn regal
-  ([regal-expr] (regal {} regal-expr))
-  ([{:keys [bind?] :or {bind? true} :as props} regal-expr]
-   (let [regal-expr (if bind? [:cat :start regal-expr :end] regal-expr)]
-     [:re
-      (merge {:regal regal-expr :gen/gen (regal-gen/gen regal-expr)} props)
-      (regal/regex regal-expr)])))
-
-(register! ::atom-of (transform-type
-                      ::atom-of
-                      (constantly deref)
-                      (constantly atom)
-                      (fn [_ children _] (first children))))
-
-(register! ::instance (m/-simple-schema
-                       (fn [_ [class]]
-                         {:type            ::instance
-                          :type-properties {:error/message (str "Should be an instance of " (pr-str class))}
-                          :pred            #(instance? class %)
-                          :min             1
-                          :max             1})))
-
-(register! ::derived-from (m/-simple-schema
-                           (fn [_ [parent]]
-                             {:type            ::derived-from
-                              :type-properties {:error/message (str "Should be derived from " (pr-str parent))}
-                              :pred            #(isa? % parent)
-                              :min             1
-                              :max             1})))
-
-;; Unfortunately there's no real way to check this without a registry on hand.
-(register! ::schema [:fn {:error/message "should be a malli schema"}
-                     any?])
-
-(register! ::registry [:fn {:error/message "should be a malli registry"}
-                       (comp some? mr/registry)])
-
-(register! ::fn [:or
-                 [:fn {:error/message "should be a function"} fn?]
-                 keyword?
-                 set?])
-
-(register! ::atom [:fn {:error/message "should be an atom"}
-                   #?(:clj (partial instance? clojure.lang.Atom)
-                      :cljs #(satisfies? cljs.core/IAtom %))])
-
-(register! ::uppercase (into [:enum] "ABCDEFHIJKLMNOPQRSTUVWXYZ"))
-
-(register! ::regex [:fn {:error/message "should be a regex"}
-                    #?(:clj (partial instance? java.util.regex.Pattern)
-                       :cljs regexp?)])
-
-(register! ::bytes #?(:clj bytes? :cljs string?))
-
-(register! ::unqualified-keyword [:and
-                                  keyword?
-                                  [:fn {:error/message "keyword should be unqualified"}
-                                   #(nil? (namespace %))]
-                                  [:fn {:error/message "keyword should have a non-empty name"}
-                                   #(not-empty (name %))]])
-
-(register! ::exception [::instance #?(:clj Throwable :cljs cljs.core/ExceptionInfo)])
-
 (def registry
   (mr/composite-registry
    (m/default-schemas) ; This can be reduced for DCE in future if desired.
@@ -246,3 +143,21 @@
   {:arglists '([name doc-string? attr-map? [params*] [schemas*] ? body])}
   [& args]
   `(av/>defn- ~@args))
+
+(def ::instance
+  (m/-simple-schema
+   (fn [_ [class]]
+     {:type            ::instance
+      :type-properties {:error/message (str "Should be an instance of " (pr-str class))}
+      :pred            #(instance? class %)
+      :min             1
+      :max             1})))
+
+(def ::derived-from
+  (m/-simple-schema
+   (fn [_ [parent]]
+     {:type            ::derived-from
+      :type-properties {:error/message (str "Should be derived from " (pr-str parent))}
+      :pred            #(isa? % parent)
+      :min             1
+      :max             1})))

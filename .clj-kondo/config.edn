@@ -1,6 +1,7 @@
 {:linters
  {:unused-namespace
-  {:exclude [common.types
+  {:exclude [factor.types
+             factor.client.types
              crafter
              react]}
 
@@ -27,23 +28,26 @@
   {:level :warning}}
 
  :hooks
- {:analyze-call {foundation.react/prop hooks.react/prop}}
+ {:analyze-call {factor.client.react/prop hooks.react/prop}}
 
  :lint-as
  {factor.examples/defexample             clojure.core/def
+  
   factor.types/def                       clojure.spec.alpha/def
   factor.types/defn                      clojure.core/defn
   factor.types/defn-                     clojure.core/defn-
-  com.tekacs.defcards/defcard            clj-kondo.lint-as/def-catch-all
-  crafter.macros/deferror                clojure.core/def
+  
+  factor.client.defcards/defcard         clj-kondo.lint-as/def-catch-all
+  
+  factor.client.react/defnc              clojure.core/defn
+  
   foundation.hooks/defcontext            clojure.core/def
+  
   foundation.icons/deficon               clojure.core/def
-  foundation.react/defnc                 clojure.core/defn
+  
   helix.core/defnc                       clojure.core/defn
-  mount.core/defstate                    clojure.core/def
-  com.wsscode.pathom.connect/defresolver clojure.core/defn
-  com.wsscode.pathom.connect/defmutation clojure.core/defn
-  instaparse.core/defparser              clojure.core/def
-  common.schema/defenum                  clojure.core/def
+
   promesa.core/let                       clojure.core/let
-  common.db.macros/defdbfn               clojure.core/defn}}
+  
+  com.wsscode.pathom.connect/defresolver clojure.core/defn
+  com.wsscode.pathom.connect/defmutation clojure.core/defn}}

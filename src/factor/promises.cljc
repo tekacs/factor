@@ -35,7 +35,7 @@
 (ty/def :use-async/status [:enum :use-async/idle :use-async/pending :use-async/success :use-async/error])
 (ty/def :use-async/value any?)
 (ty/def :use-async/error any?)
-(ty/def :use-async/start! ::ty/fn)
+(ty/def :use-async/start! ifn?)
 (ty/def :use-async/result
   [:map
    :use-async/start!
@@ -46,10 +46,10 @@
    (ty/defn ^{:aave.core/enforce-purity false} use-async
      "Based on https://usehooks.com/useAsync/"
      ([async-fn initial-value]
-      [::ty/fn any? => :use-async/result]
+      [ifn? any? => :use-async/result]
       (use-async async-fn initial-value true))
      ([async-fn initial-value immediate?]
-      [::ty/fn any? [:maybe boolean?] => :use-async/result]
+      [ifn? any? [:maybe boolean?] => :use-async/result]
       (let [[status set-status!] (hook/use-state :use-async/idle)
             [value set-value!]   (hook/use-state initial-value)
             [error set-error!]   (hook/use-state nil)
