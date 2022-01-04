@@ -1,6 +1,7 @@
 (ns factor.server.example
   (:require [factor.server.config :as config]
-            [factor.server.repl :as repl]
+            [factor.system :as system]
+            [factor.system.state :as state]
             [integrant.core :as ig]))
 
 (comment
@@ -10,31 +11,31 @@
 
   ;; There are a few configurations that the library consumer must set itself.
   ;; - `:factor/context` should be overridden as above and therefore should use whatever config is appropriate.
-  ;; - `:factor.system/profile` should be set to `:development`, `:production` or `:test` -- it will be set from `NODE_ENV` in ClojureScript
+  ;; - `:factor.environment/profile` should be set to `:development`, `:production` or `:test` -- it will be set from `NODE_ENV` in ClojureScript
   ;; - `:factor.server.routing/cors-configuration` should be set to a list of regexes of accepted CORS Origins.
-  (repl/set-prep!
+  (system/set-prep!
    (fn []
      (assoc factor.server.config/template
             :factor/context {}
-            :factor.system/profile :development
+            :factor.environment/profile :development
             :factor.server.routing/cors-configuration [#"https://tekacs.com"])))
 
   ;; Get the application started -- first by loading namespaces and then starting up.
-  (repl/load-namespaces)
-  (repl/go)
+  (system/load-namespaces)
+  (system/go)
 
   ;; Stop the application.
-  (repl/halt)
+  (system/halt)
 
   ;; Suspend, reload namespaces using tools.namespace.repl and then Resume.
-  (repl/reset)
+  (system/reset)
 
   ;; Suspend, reload every namespace possible on disk using t.n.repl and then Resume.
-  (repl/reset-all)
+  (system/reset-all)
 
-  ;; The current system config is in `repl/config` -- may contain secrets in production!
-  repl/config
+  ;; The current system config is in `system.state/config` -- may contain secrets in production!
+  state/config
 
-  ;; The current system map itself is in `repl/system`.
-  repl/system
+  ;; The current system map itself is in `system.state/system`.
+  state/system
   )

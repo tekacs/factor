@@ -1,6 +1,6 @@
 (ns factor.debugging
   (:require #?(:cljs [clojure.string :as string])
-            #?(:cljs [factor.browser :as browser])
+            #?(:cljs [factor.client.browser :as browser])
             [factor.types :as ty :refer [=>]]
             [fipp.edn :as fipp]))
 

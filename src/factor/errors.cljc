@@ -27,7 +27,7 @@
    [::ty/explanation {:optional true} [:or :map :string]]
    [::ty/humanized {:optional true} :string]])
 
-(def ::exception
+(ty/def ::exception
   [::instance #?(:clj Throwable :cljs js/Error)])
 
 (ty/defn error?
