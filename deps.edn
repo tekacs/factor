@@ -14,7 +14,6 @@
         com.xtdb/xtdb-core             {:mvn/version "1.20.0"}
         com.xtdb/xtdb-http-server      {:mvn/version "1.20.0"}
         com.xtdb/xtdb-http-client      {:mvn/version "1.20.0"}
-        ch.qos.logback/logback-classic {:mvn/version "1.2.9"}
 
         metosin/malli                  {:mvn/version "0.5.1"}
         tekacs/aave                    {:git/url "https://github.com/tekacs/aave"
@@ -46,18 +45,20 @@
  :aliases
  {:http {:main-opts ["-m" "http"]}
 
-  :server {:extra-deps {integrant/repl             {:mvn/version "0.3.2"}
+  :server {:extra-deps {integrant/repl                 {:mvn/version "0.3.2"}
 
-                        http-kit/http-kit          {:mvn/version "2.5.1"}
+                        http-kit/http-kit              {:mvn/version "2.5.1"}
 
-                        ring/ring-defaults         {:mvn/version "0.3.2"}
-                        com.cognitect/transit-clj  {:mvn/version "1.0.324"}
-                        metosin/muuntaja           {:mvn/version "0.6.7"}
-                        ring/ring-core             {:mvn/version "1.8.2"} ; For middleware
-                        ring/ring-jetty-adapter    {:mvn/version "1.8.2"} ; For middleware
-                        ring-cors/ring-cors        {:mvn/version "0.1.13"}
+                        ring/ring-defaults             {:mvn/version "0.3.2"}
+                        com.cognitect/transit-clj      {:mvn/version "1.0.324"}
+                        metosin/muuntaja               {:mvn/version "0.6.7"}
+                        ring/ring-core                 {:mvn/version "1.8.2"} ; For middleware
+                        ring/ring-jetty-adapter        {:mvn/version "1.8.2"} ; For middleware
+                        ring-cors/ring-cors            {:mvn/version "0.1.13"}
 
-                        amazonica/amazonica        {:mvn/version "0.3.153"}}
+                        amazonica/amazonica            {:mvn/version "0.3.153"}
+
+                        ch.qos.logback/logback-classic {:mvn/version "1.2.9"}}
            :jvm-opts ["-Dmalli.registry/type=custom"]}
 
   :client {:extra-deps {org.clojure/clojurescript  {:mvn/version "1.10.866"}
