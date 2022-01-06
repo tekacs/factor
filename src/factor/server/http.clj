@@ -17,3 +17,8 @@
 
 (defmethod ig/halt-key! ::server [_ server]
   (some-> (hk/server-stop! server) deref))
+
+(def config
+  {:factor.server.http/server
+   {:port    nil ;; NOTE: See default value in ig/prep-key
+    :handler (ig/ref :factor.server.routing/handle)}})

@@ -27,3 +27,8 @@
 (defmethod ig/halt-key! ::nrepl-server
   [_ server]
   (nrepl.server/stop-server server))
+
+(def config
+  {:factor.server.repl/nrepl-server
+   {:host nil
+    :port nil}})

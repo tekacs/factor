@@ -75,3 +75,14 @@
 
 (defmethod ig/halt-key! ::handler [_ channel]
   (close! channel))
+
+(def config
+  {:factor.server.sente/server-options
+   {:user-id-fn nil}
+
+   :factor.server.sente/server
+   {:options (ig/ref :factor.server.sente/server-options)}
+
+   :factor.server.sente/handler
+   {:server  (ig/ref :factor.server.sente/server)
+    :context (ig/ref :factor/context)}})
