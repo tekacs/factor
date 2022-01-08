@@ -19,7 +19,7 @@
 
 ;; region Middleware
 
-(methodical/defmethod injection/init-key ::exception-handlers [_ _]
+(methodical/defmethod injection/init-key ::exception-handlers [_ _ _]
   (assoc
    exception/default-handlers
    
@@ -69,7 +69,7 @@
 
 ;; endregion Middleware
 
-(methodical/defmethod injection/init-key ::handlers [_ {:keys [_base-ctx sente-server]}]
+(methodical/defmethod injection/init-key ::handlers [_ {:keys [_base-ctx sente-server]} _]
   {::home           (constantly {:name ::home :body "Shoo"})
    ::echo           (fn [req] {:name ::echo :body (keys req)})
    ::headers        (fn [req] {:name ::headers :body (:headers req)})
@@ -77,7 +77,7 @@
    ::sente-get      (:get-and-ws-handler sente-server)
    ::sente-post     (:post-handler sente-server)})
 
-(methodical/defmethod injection/init-key ::routes [_ {:keys [handlers]}]
+(methodical/defmethod injection/init-key ::routes [_ {:keys [handlers]} _]
   [["/" {:get (handlers ::home)}]
    ["/dev"
     ["/echo" {:get (handlers ::echo)}]
@@ -85,7 +85,7 @@
     ["/decode" {:post (handlers ::decode)}]]
    ["/api" {:get (handlers ::sente-get) :post (handlers ::sente-post)}]])
 
-(methodical/defmethod injection/init-key ::cors-configuration [_ {:keys [origins]}]
+(methodical/defmethod injection/init-key ::cors-configuration [_ {:keys [origins]} _]
   {:access-control-allow-origin      origins
    :access-control-allow-credentials "true"
    :access-control-allow-methods     [:get :put :post :delete]
@@ -94,7 +94,7 @@
                                       "x-csrf-token"
                                       "x-requested-with"]})
 
-(methodical/defmethod injection/init-key ::router [_ {:keys [routes cors-configuration exception-handlers]}]
+(methodical/defmethod injection/init-key ::router [_ {:keys [routes cors-configuration exception-handlers]} _]
   (http/router
     routes
     {:exception pretty/exception
@@ -110,7 +110,7 @@
                                   (multipart/multipart-interceptor)
                                   cors-interceptor]}}))
 
-(methodical/defmethod injection/init-key ::handle [_ {:keys [router]}]
+(methodical/defmethod injection/init-key ::handle [_ {:keys [router]} _]
   (http/ring-handler
     router
     (ring/create-default-handler)

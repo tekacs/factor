@@ -1,7 +1,9 @@
 (ns factor.server.example
   (:gen-class)
-  (:require [factor.server.http :as http]
+  (:require [com.wsscode.pathom3.connect.built-in.resolvers :as pbir]
+            [factor.server.http :as http]
             [factor.server.injection :as injection]
+            [factor.server.pathom :as pathom]
             [factor.server.repl :as repl]
             [factor.server.routing :as routing]
             [factor.server.sente :as sente]
@@ -13,9 +15,12 @@
 
 (defn config []
   (assoc
-   (merge repl/config sente/config routing/config http/config)
+   (merge repl/config pathom/config sente/config routing/config http/config)
    :factor/context {:nrepl-server (injection/ref ::repl/nrepl-server)}
    :factor.environment/profile :development
+   
+   [::pathom/resolvers ::pathom/default] [(pbir/constantly-fn-resolver ::now (fn [] (java.util.Date.)))]
+   ::sente/handle-event! {:dispatch-map {:default (injection/ref [::pathom/sente-handler ::pathom/default])}}
    ::routing/cors-configuration [#"https://tekacs.com"]))
 
 (defn -main []

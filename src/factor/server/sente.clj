@@ -30,19 +30,18 @@
        (methodical/add-primary-method :chsk/ws-ping (fn [_ _] "This is just a keepalive message")))
     dispatch-map (multimethods/add-methods dispatch-map)))
 
-(methodical/defmethod injection/prep-key ::server-options [_ config]
+(methodical/defmethod injection/prep-key ::server-options [_ config _]
   (update config :user-id-fn #(or % :session-id)))
 
 ;; The default user-id is extracted from Ring parameters, as sent by client.sente.
 ;; To extract the user-id in a different way, just redefine this defmethod downstream.
-(methodical/defmethod injection/init-key ::server-options
-  [_ {:keys [user-id-fn]}]
+(methodical/defmethod injection/init-key ::server-options [_ {:keys [user-id-fn]} _]
   {:csrf-token-fn nil
    :packer        packer
    :user-id-fn    (fn [req] (some-> req :params user-id-fn (UUID/fromString)))})
 
 ;; The actual sente server.
-(methodical/defmethod injection/init-key ::server [_ {:keys [options]}]
+(methodical/defmethod injection/init-key ::server [_ {:keys [options]} _]
   (let [{:keys [ch-recv send-fn connected-uids ajax-post-fn ajax-get-or-ws-handshake-fn]}
         (sente/make-channel-socket-server! (get-sch-adapter) options)]
     {:post-handler ajax-post-fn
@@ -51,16 +50,16 @@
      :send! send-fn
      :connected-uids$ connected-uids}))
 
-(methodical/defmethod injection/halt-key! ::server [_ {:keys [receive-channel]}]
+(methodical/defmethod injection/halt-key! ::server [_ {:keys [receive-channel]} _]
   (close! receive-channel))
 
 ;; A reaction loop, which calls `handle-event!` for every server-side sente message.
-(methodical/defmethod injection/init-key ::handler [_ {:keys [handle-event! server context]}]
+(methodical/defmethod injection/init-key ::handler [_ {:keys [handle-event! server context]} _]
   (async/reaction-loop
    (:receive-channel server)
    (fn [msg] (handle-event! context msg))))
 
-(methodical/defmethod injection/halt-key! ::handler [_ channel]
+(methodical/defmethod injection/halt-key! ::handler [_ channel _]
   (close! channel))
 
 (def config
