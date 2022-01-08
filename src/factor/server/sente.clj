@@ -12,10 +12,6 @@
             [taoensso.timbre :as timbre])
   (:import (java.util UUID)))
 
-(def packer
-  "A transit+json-based packer to send/receive from the sente client using encoding readers/writers"
-  (->TransitPacker :json {:handlers encoding/write-handlers} {:handlers encoding/read-handlers}))
-
 ;; This can be extended by providing a `dispatch-map`, by adding an `:after ::handle-event!` method with methodical, or both.
 (methodical/defmethod injection/init-key ::handle-event! [_ {:keys [dispatch-map]} _]
   ;; A handler that receives all server-side events from sente:
@@ -30,12 +26,15 @@
        (methodical/add-primary-method :chsk/ws-ping (fn [_ _] "This is just a keepalive message")))
     dispatch-map (multimethods/add-methods dispatch-map)))
 
+(methodical/defmethod injection/init-key ::packer [_ {:keys [encoder-opts decoder-opts]} _]
+  (->TransitPacker :json encoder-opts decoder-opts))
+
 (methodical/defmethod injection/prep-key ::server-options [_ config _]
   (update config :user-id-fn #(or % :session-id)))
 
 ;; The default user-id is extracted from Ring parameters, as sent by client.sente.
 ;; To extract the user-id in a different way, just redefine this defmethod downstream.
-(methodical/defmethod injection/init-key ::server-options [_ {:keys [user-id-fn]} _]
+(methodical/defmethod injection/init-key ::server-options [_ {:keys [packer user-id-fn]} _]
   {:csrf-token-fn nil
    :packer        packer
    :user-id-fn    (fn [req] (some-> req :params user-id-fn (UUID/fromString)))})
@@ -66,8 +65,12 @@
   {::handle-event!
    {}
 
+   ::packer
+   {:encoder-opts (injection/ref ::encoding/encoder-opts)
+    :decoder-opts (injection/ref ::encoding/decoder-opts)}
+
    ::server-options
-   {:user-id-fn nil}
+   {:packer (injection/ref ::packer) :user-id-fn nil}
 
    ::server
    {:options (injection/ref :factor.server.sente/server-options)}

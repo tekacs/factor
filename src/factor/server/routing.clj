@@ -1,6 +1,5 @@
 (ns factor.server.routing
-  (:require [factor.encoding :as encoding]
-            [factor.errors :as err]
+  (:require [factor.errors :as err]
             [factor.server.injection :as injection]
             [methodical.core :as methodical]
             [reitit.dev.pretty :as pretty]
@@ -94,12 +93,12 @@
                                       "x-csrf-token"
                                       "x-requested-with"]})
 
-(methodical/defmethod injection/init-key ::router [_ {:keys [routes cors-configuration exception-handlers]} _]
+(methodical/defmethod injection/init-key ::router [_ {:keys [routes muuntaja-instance cors-configuration exception-handlers]} _]
   (http/router
     routes
     {:exception pretty/exception
      ;; :reitit.interceptor/transform dev/print-context-diffs
-     :data      {:muuntaja       encoding/muuntaja-instance
+     :data      {:muuntaja       muuntaja-instance
                  :access-control cors-configuration
                  :interceptors   [(parameters/parameters-interceptor)
                                   keyword-params
@@ -134,8 +133,9 @@
 
    ::router
    {:routes (injection/ref ::routes)
-    :exception-handlers (injection/ref ::exception-handlers)
-    :cors-configuration (injection/ref ::cors-configuration)}
+    :muuntaja-instance (injection/ref :factor.encoding/muuntaja-instance)
+    :cors-configuration (injection/ref ::cors-configuration)
+    :exception-handlers (injection/ref ::exception-handlers)}
 
    ::handle
    {:router (injection/ref ::router)}})

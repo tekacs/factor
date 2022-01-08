@@ -1,6 +1,7 @@
 (ns factor.server.example
   (:gen-class)
   (:require [com.wsscode.pathom3.connect.built-in.resolvers :as pbir]
+            [factor.encoding :as encoding]
             [factor.server.http :as http]
             [factor.server.injection :as injection]
             [factor.server.pathom :as pathom]
@@ -15,7 +16,7 @@
 
 (defn config []
   (assoc
-   (merge repl/config pathom/config sente/config routing/config http/config)
+   (merge repl/config encoding/config pathom/config sente/config routing/config http/config)
    :factor/context {:nrepl-server (injection/ref ::repl/nrepl-server)}
    :factor.environment/profile :development
    
