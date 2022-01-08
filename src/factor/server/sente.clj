@@ -21,15 +21,14 @@
   ;; A handler that receives all server-side events from sente:
   ;; - sente system events  (all of the :chsk/* events)
   ;; - client-sent events (anything else, passed through as-is from the client)
-  (let [multifn
-        (-> (multimethods/clojure-multimethod (fn [_ {[event-kwd _] :event}] event-kwd))
-            (methodical/add-primary-method :default (fn [_ msg] (doto [:unhandled-event (-> msg :event first) (keys msg)] timbre/info)))
-            (methodical/add-primary-method :chsk/uidport-close (fn [_ {:keys [client-id uid]}] (doto [:client-disconnected {:client-id client-id :uid uid}] timbre/info)))
-            (methodical/add-primary-method :chsk/uidport-open (fn [_ {:keys [client-id uid]}] (doto [:client-connected {:client-id client-id :uid uid}] timbre/info)))
-            (methodical/add-primary-method :chsk/bad-package (fn [_ msg] (doto [:invalid-serialization msg] timbre/info)))
-            (methodical/add-primary-method :chsk/ws-ping (fn [_ _] "This is just a keepalive message")))]
-    (cond-> multifn
-      dispatch-map (multimethods/add-methods dispatch-map))))
+  (cond->
+   (-> (multimethods/clojure-multimethod (fn [_ {[event-kwd _] :event}] event-kwd))
+       (methodical/add-primary-method :default (fn [_ msg] (doto [:unhandled-event (-> msg :event first) (keys msg)] timbre/info)))
+       (methodical/add-primary-method :chsk/uidport-close (fn [_ {:keys [client-id uid]}] (doto [:client-disconnected {:client-id client-id :uid uid}] timbre/info)))
+       (methodical/add-primary-method :chsk/uidport-open (fn [_ {:keys [client-id uid]}] (doto [:client-connected {:client-id client-id :uid uid}] timbre/info)))
+       (methodical/add-primary-method :chsk/bad-package (fn [_ msg] (doto [:invalid-serialization msg] timbre/info)))
+       (methodical/add-primary-method :chsk/ws-ping (fn [_ _] "This is just a keepalive message")))
+    dispatch-map (multimethods/add-methods dispatch-map)))
 
 (methodical/defmethod injection/prep-key ::server-options [_ config]
   (update config :user-id-fn #(or % :session-id)))
@@ -67,7 +66,7 @@
 (def config
   {::handle-event!
    {}
-   
+
    ::server-options
    {:user-id-fn nil}
 
