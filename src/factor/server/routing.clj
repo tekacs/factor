@@ -1,7 +1,8 @@
 (ns factor.server.routing
   (:require [factor.encoding :as encoding]
             [factor.errors :as err]
-            [integrant.core :as ig]
+            [factor.server.injection :as injection]
+            [methodical.core :as methodical]
             [reitit.dev.pretty :as pretty]
             [reitit.http :as http]
             [reitit.http.interceptors.exception :as exception]
@@ -18,7 +19,7 @@
 
 ;; region Middleware
 
-(defmethod ig/init-key ::exception-handlers [_ _]
+(methodical/defmethod injection/init-key ::exception-handlers [_ _]
   (assoc
    exception/default-handlers
    
@@ -68,7 +69,7 @@
 
 ;; endregion Middleware
 
-(defmethod ig/init-key ::handlers [_ {:keys [_base-ctx sente-server]}]
+(methodical/defmethod injection/init-key ::handlers [_ {:keys [_base-ctx sente-server]}]
   {::home           (constantly {:name ::home :body "Shoo"})
    ::echo           (fn [req] {:name ::echo :body (keys req)})
    ::headers        (fn [req] {:name ::headers :body (:headers req)})
@@ -76,7 +77,7 @@
    ::sente-get      (:get-and-ws-handler sente-server)
    ::sente-post     (:post-handler sente-server)})
 
-(defmethod ig/init-key ::routes [_ {:keys [handlers]}]
+(methodical/defmethod injection/init-key ::routes [_ {:keys [handlers]}]
   [["/" {:get (handlers ::home)}]
    ["/dev"
     ["/echo" {:get (handlers ::echo)}]
@@ -84,7 +85,7 @@
     ["/decode" {:post (handlers ::decode)}]]
    ["/api" {:get (handlers ::sente-get) :post (handlers ::sente-post)}]])
 
-(defmethod ig/init-key ::cors-configuration [_ {:keys [origins]}]
+(methodical/defmethod injection/init-key ::cors-configuration [_ {:keys [origins]}]
   {:access-control-allow-origin      origins
    :access-control-allow-credentials "true"
    :access-control-allow-methods     [:get :put :post :delete]
@@ -93,7 +94,7 @@
                                       "x-csrf-token"
                                       "x-requested-with"]})
 
-(defmethod ig/init-key ::router [_ {:keys [routes cors-configuration exception-handlers]}]
+(methodical/defmethod injection/init-key ::router [_ {:keys [routes cors-configuration exception-handlers]}]
   (http/router
     routes
     {:exception pretty/exception
@@ -109,7 +110,7 @@
                                   (multipart/multipart-interceptor)
                                   cors-interceptor]}}))
 
-(defmethod ig/init-key ::handle [_ {:keys [router]}]
+(methodical/defmethod injection/init-key ::handle [_ {:keys [router]}]
   (http/ring-handler
     router
     (ring/create-default-handler)
@@ -118,23 +119,23 @@
 (def config
   {;; XXX: This MUST be overridden by the user for production use.
    ;; Each origin should be a regex of the domain, as in the commented out example below.
-   :factor.server.routing/cors-configuration
+   ::cors-configuration
    {:origins [#_#"https://tekacs.com"]}
 
-   :factor.server.routing/exception-handlers
+   ::exception-handlers
    {}
 
-   :factor.server.routing/handlers
-   {:context (ig/ref :factor/context)
-    :sente-server (ig/ref :factor.server.sente/server)}
+   ::handlers
+   {:context (injection/ref :factor/context)
+    :sente-server (injection/ref :factor.server.sente/server)}
 
-   :factor.server.routing/routes
-   {:handlers (ig/ref :factor.server.routing/handlers)}
+   ::routes
+   {:handlers (injection/ref ::handlers)}
 
-   :factor.server.routing/router
-   {:routes (ig/ref :factor.server.routing/routes)
-    :exception-handlers (ig/ref :factor.server.routing/exception-handlers)
-    :cors-configuration (ig/ref :factor.server.routing/cors-configuration)}
+   ::router
+   {:routes (injection/ref ::routes)
+    :exception-handlers (injection/ref ::exception-handlers)
+    :cors-configuration (injection/ref ::cors-configuration)}
 
-   :factor.server.routing/handle
-   {:router (ig/ref :factor.server.routing/router)}})
+   ::handle
+   {:router (injection/ref ::router)}})

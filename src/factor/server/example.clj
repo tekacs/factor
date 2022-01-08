@@ -1,37 +1,39 @@
 (ns factor.server.example
   (:gen-class)
   (:require [factor.server.http :as http]
+            [factor.server.injection :as injection]
             [factor.server.repl :as repl]
             [factor.server.routing :as routing]
             [factor.server.sente :as sente]
             [factor.system :as system]
             [factor.system.state :as state]
-            [integrant.core :as ig]))
+            [methodical.core :as methodical]))
 
-;; The library consumer must define `:factor/context`, with a definition that makes sense for the application.
-;; It will be passed to all handers and used in many locations in the app -- so it should be customized.
-(defmethod ig/init-key :factor/context [_ _] {})
+(methodical/defmethod injection/init-key :factor/context [_ config _] config)
+
+(defn config []
+  (assoc
+   (merge repl/config sente/config routing/config http/config)
+   :factor/context {:nrepl-server (injection/ref ::repl/nrepl-server)}
+   :factor.environment/profile :development
+   ::routing/cors-configuration [#"https://tekacs.com"]))
 
 (defn -main []
   ;; There are a few configurations that the library consumer must set itself.
   ;; - `:factor/context` should be overridden as above and therefore should use whatever config is appropriate.
   ;; - `:factor.environment/profile` should be set to `:development`, `:production` or `:test` -- it will be set from `NODE_ENV` in ClojureScript
   ;; - `:factor.server.routing/cors-configuration` should be set to a list of regexes of accepted CORS Origins.
-  (system/set-prep!
-   (fn []
-     (assoc
-      (merge repl/config sente/config routing/config http/config)
-      :factor/context {}
-      :factor.environment/profile :development
-      :factor.server.routing/cors-configuration [#"https://tekacs.com"])))
+  (system/set-prep! (fn [] (#'config)))
 
   ;; Get the application started -- first by loading namespaces and then starting up.
   (system/load-namespaces)
-  (system/go)
-  )
+  (system/go))
 
 (comment
   (-main)
+
+  ;; Reload config
+  (system/prep)
 
   ;; Stop the application.
   (system/halt)

@@ -27,6 +27,9 @@
   (system/go))
 
 (comment
+  ;; Reload config
+  (system/prep)
+
   ;; Stop the application.
   (system/halt)
 

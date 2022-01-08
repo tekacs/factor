@@ -50,4 +50,10 @@
   promesa.core/let                       clojure.core/let
   
   com.wsscode.pathom.connect/defresolver clojure.core/defn
-  com.wsscode.pathom.connect/defmutation clojure.core/defn}}
+  com.wsscode.pathom.connect/defmutation clojure.core/defn
+  
+  com.fulcrologic.guardrails.core/>defn  clojure.core/defn
+  com.fulcrologic.guardrails.core/>def   clojure.spec.alpha/def
+  
+  methodical.core/defmulti               clojure.core/defmulti
+  methodical.core/defmethod              clojure.core/defmethod}}

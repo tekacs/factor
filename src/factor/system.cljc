@@ -34,12 +34,17 @@
      #?(:clj (alter-var-root #'state/system update-fn)
         :cljs (swap! state/system$ update-fn)))))
 
+(defn set-config-loader!
+  "Set the function used to load config whenever the system is started."
+  [config-loader-fn]
+  (lentes/put <>preparer config-loader-fn nil))
+
 (defn set-prep!
   "Set the function used to load config whenever the system is started.
   
   The function is automatically composed with `integrant.core/prep` to get the config ready for use."
   [config-loader-fn]
-  (lentes/put <>preparer (comp ig/prep config-loader-fn) nil))
+  (set-config-loader! (comp ig/prep config-loader-fn)))
 
 (defn- prep-error []
   (ex-info "No system preparer function found." {}))

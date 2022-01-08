@@ -1,4 +1,5 @@
 [! factor.client.routing "provide a way of identifying 'our domains' to allow our-origin? and therefore navigate-to-internal-href! to work"]
+[factor.system "see if server-side Clojure can use https://github.com/palletops/ns-reload instead of tools.namespace.repl"]
 [factor.client.routing "switch to reitit.frontend from react-router"]
 [factor.server.pathom "built-in support for Pathom"]
 [factor.client.pathom "client-side resolvers for Pathom that can cache or intercept if they know how to respond to an EQL query"]

@@ -1,4 +1,5 @@
-(ns factor.vectors)
+(ns factor.vectors
+  (:require [factor.types :as ty]))
 
 ;; vec-* utilities originally from https://gist.github.com/sebastibe/27be496c34ba6a3cce3b6425810a3dda
 (ty/defn vec-remove
