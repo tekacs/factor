@@ -1,4 +1,4 @@
-(ns factor.server.pathom
+(ns factor.pathom.server
   (:require [com.wsscode.pathom3.cache :as p.cache]
             [com.wsscode.pathom3.connect.built-in.resolvers :as pbir]
             [com.wsscode.pathom3.connect.built-in.plugins :as pbip]
@@ -15,31 +15,30 @@
             [com.wsscode.pathom3.interface.smart-map :as psm]
             [com.wsscode.pathom3.path :as p.path]
             [com.wsscode.pathom3.plugin :as p.plugin]
-            [factor.server.injection :as injection]
-            [methodical.core :as methodical]))
+            [integrant.core :as ig]))
 
 ;; Based on https://pathom3.wsscode.com/docs/tutorials/serverless-pathom-gcf/
 
-(methodical/defmethod injection/init-key ::resolvers [_ resolvers _]
+(defmethod ig/init-key ::resolvers [_ resolvers]
   resolvers)
 
-(methodical/defmethod injection/init-key ::plan-cache$ [_ _ _]
+(defmethod ig/init-key ::plan-cache$ [_ _]
   ;; TODO: Switch to an LRU cache, like https://pathom3.wsscode.com/docs/cache/#using-corecache
   (atom {}))
 
-(methodical/defmethod injection/init-key ::env [_ {:keys [plan-cache$ resolvers]} _]
+(defmethod ig/init-key ::env [_ {:keys [plan-cache$ resolvers]}]
   (pci/register {::pcp/plan-cache* plan-cache$} resolvers))
 
-(methodical/defmethod injection/init-key ::boundary-interface [_ {:keys [env]} _]
+(defmethod ig/init-key ::boundary-interface [_ {:keys [env]}]
   (p.eql/boundary-interface env))
 
-(methodical/defmethod injection/init-key ::sente-handler [_ {:keys [boundary-interface request-keys]} _]
+(defmethod ig/init-key ::sente-handler [_ {:keys [boundary-interface request-keys]}]
   (fn [context {[_ query] :event :keys [?reply-fn ring-req]}]
     (?reply-fn (boundary-interface (merge context (select-keys ring-req request-keys)) query))))
 
 (def config
   {[::plan-cache$ ::default] {}
-   [::env ::default] {:plan-cache$ (injection/ref [::plan-cache$ ::default])
-                     :resolvers (injection/ref [::resolvers ::default])}
-   [::boundary-interface ::default] {:env (injection/ref [::env ::default])}
-   [::sente-handler ::default] {:boundary-interface (injection/ref [::boundary-interface ::default])}})
+   [::env ::default] {:plan-cache$ (ig/ref [::plan-cache$ ::default])
+                     :resolvers (ig/ref [::resolvers ::default])}
+   [::boundary-interface ::default] {:env (ig/ref [::env ::default])}
+   [::sente-handler ::default] {:boundary-interface (ig/ref [::boundary-interface ::default])}})

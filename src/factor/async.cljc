@@ -4,37 +4,36 @@
             #?(:clj [clojure.core.async.impl.protocols]
                :cljs [cljs.core.async.impl.protocols])
             [factor.types :as ty]
-            #?(:cljs [helix.hooks :as hook])
-            [promesa.core :as pc]))
+            #?(:cljs [helix.hooks :as hook])))
 
 ;; TODO: Effect handling here could be well-approached using a >defn-go macro:
 ;; https://github.com/gnl/ghostwheel/issues/24#issuecomment-511208880
 
 (ty/def ::readable
   [:fn #(satisfies?
-          #?(:clj  clojure.core.async.impl.protocols/ReadPort
-             :cljs cljs.core.async.impl.protocols/ReadPort)
-          %)])
+         #?(:clj  clojure.core.async.impl.protocols/ReadPort
+            :cljs cljs.core.async.impl.protocols/ReadPort)
+         %)])
 (ty/def ::writeable
   [:fn #(satisfies?
-          #?(:clj  clojure.core.async.impl.protocols/WritePort
-             :cljs cljs.core.async.impl.protocols/WritePort)
-          %)])
+         #?(:clj  clojure.core.async.impl.protocols/WritePort
+            :cljs cljs.core.async.impl.protocols/WritePort)
+         %)])
 (ty/def ::channel
   [:fn #(satisfies?
-          #?(:clj  clojure.core.async.impl.protocols/Channel
-             :cljs cljs.core.async.impl.protocols/Channel)
-          %)])
+         #?(:clj  clojure.core.async.impl.protocols/Channel
+            :cljs cljs.core.async.impl.protocols/Channel)
+         %)])
 (ty/def ::handler
   [:fn #(satisfies?
-          #?(:clj  clojure.core.async.impl.protocols/Handler
-             :cljs cljs.core.async.impl.protocols/Handler)
-          %)])
+         #?(:clj  clojure.core.async.impl.protocols/Handler
+            :cljs cljs.core.async.impl.protocols/Handler)
+         %)])
 (ty/def ::buffer
   [:fn #(satisfies?
-          #?(:clj  clojure.core.async.impl.protocols/Buffer
-             :cljs cljs.core.async.impl.protocols/Buffer)
-          %)])
+         #?(:clj  clojure.core.async.impl.protocols/Buffer
+            :cljs cljs.core.async.impl.protocols/Buffer)
+         %)])
 
 (ty/def ::promise
   #?(:clj [:fn #(satisfies? java.util.concurrent.CompletableFuture %)]
@@ -65,17 +64,6 @@
        (reset! at (map-fn next-value))
        (recur)))
    at))
-
-(defn terminate!?
-  "Handle both result and error cases of a promise and stop handling here. Returns nil."
-  [p% f err-f]
-  (pc/handle
-    p%
-    (fn [good bad]
-      (cond
-        good (f good)
-        bad  (err-f bad))))
-  nil)
 
 #?(:cljs
    (defn use-channel

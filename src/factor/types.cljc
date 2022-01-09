@@ -5,10 +5,9 @@
   #?(:cljs (:require-macros [factor.types]))
   (:require [aave.code]
             [aave.core :as av]
+            [clojure.spec.alpha :as spec]
             [clojure.test.check.generators :as gen]
             [factor.types.state :refer [registry$]]
-            [lambdaisland.regal :as regal]
-            [lambdaisland.regal.generator :as regal-gen]
             [malli.core :as m]
             [malli.error :as me]
             [malli.generator :as mg]
@@ -46,6 +45,12 @@
 
 (clojure.core/defn register-all! [spec-map]
   (swap! registry$ merge spec-map))
+
+(clojure.core/defn from-spec-type
+  [spec-type]
+  [:fn
+   {:error/fn (fn [{:keys [value]} _] (spec/explain-str spec-type value))}
+   #(spec/valid? spec-type %)])
 
 (clojure.core/defn mapped-type
   ([type mapper] (mapped-type type mapper nil nil nil))

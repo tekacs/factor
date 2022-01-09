@@ -3,7 +3,29 @@
             [factor.system.state :as state]
             [factor.types :as ty]
             [integrant.core :as ig]
-            [lentes.core :as lentes]))
+            [lentes.core :as lentes]
+            [malli.core :as m]
+            [malli.error :as me]))
+
+;; TODO: Use this to validate, as is done in integrant. Not done yet because it requires overriding `ig/init` and `ig/resume`, which I'm not sure I want to do.
+;; Taken from https://github.com/weavejester/integrant/blob/32a46f5dca8a6b563a6dddf88bec887be3201b08/src/integrant/core.cljc#L405
+(defmulti pre-init-spec @#'ig/normalize-key)
+(defmulti post-init-spec @#'ig/normalize-key)
+
+(defn- spec-exception [system k v spec ed]
+  (ex-info (str "Spec failed on key " k " when building system\n"
+                (me/humanize ed))
+           {:reason   ::build-failed-spec
+            :system   system
+            :key      k
+            :value    v
+            :spec     spec
+            :explain  ed}))
+
+(defn- assert-pre-init-spec [system key value]
+  (when-let [spec (pre-init-spec key)]
+    (when-not (m/validate spec value)
+      (throw (spec-exception system key value spec (m/explain spec value))))))
 
 (declare reset)
 

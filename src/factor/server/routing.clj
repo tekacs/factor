@@ -126,7 +126,7 @@
 
    ::handlers
    {:context (injection/ref :factor/context)
-    :sente-server (injection/ref :factor.server.sente/server)}
+    :sente-server (injection/ref :factor.sente.server/server)}
 
    ::routes
    {:handlers (injection/ref ::handlers)}

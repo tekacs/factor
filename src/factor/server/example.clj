@@ -2,12 +2,14 @@
   (:gen-class)
   (:require [com.wsscode.pathom3.connect.built-in.resolvers :as pbir]
             [factor.encoding :as encoding]
+            [factor.pathom.server :as pathom-server]
+            [factor.sente :as sente]
+            [factor.sente.server :as sente-server]
             [factor.server.http :as http]
             [factor.server.injection :as injection]
-            [factor.server.pathom :as pathom]
             [factor.server.repl :as repl]
             [factor.server.routing :as routing]
-            [factor.server.sente :as sente]
+            [factor.server.sente-http :as sente-http]
             [factor.system :as system]
             [factor.system.state :as state]
             [methodical.core :as methodical]))
@@ -16,13 +18,13 @@
 
 (defn config []
   (assoc
-   (merge repl/config encoding/config pathom/config sente/config routing/config http/config)
+   (merge repl/config encoding/config pathom-server/config sente/config sente-http/config sente-server/config routing/config http/config)
    :factor/context {:nrepl-server (injection/ref ::repl/nrepl-server)}
    :factor.environment/profile :development
    
-   [::pathom/resolvers ::pathom/default] [(pbir/constantly-fn-resolver ::now (fn [] (java.util.Date.)))]
-   ::sente/handle-event! {:dispatch-map {:default (injection/ref [::pathom/sente-handler ::pathom/default])}}
-   ::routing/cors-configuration [#"https://tekacs.com"]))
+   [::pathom-server/resolvers ::pathom-server/default] [(pbir/constantly-fn-resolver ::now (fn [] (java.util.Date.)))]
+   ::sente-server/handle-event! {:dispatch-map {:default (injection/ref [::pathom-server/sente-handler ::pathom-server/default])}}
+   ::routing/cors-configuration {:origins [#"http://localhost:3000"]}))
 
 (defn -main []
   ;; There are a few configurations that the library consumer must set itself.

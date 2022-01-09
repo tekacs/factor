@@ -1,6 +1,9 @@
 (ns factor.client.example
   (:require [factor.client.react :as react]
+            [factor.encoding :as encoding]
             [factor.environment]
+            [factor.sente :as sente]
+            [factor.sente.client :as sente-client]
             [factor.system :as system]
             [factor.system.state :as state]
             [helix.hooks :as hook]
@@ -15,10 +18,17 @@
     (react/$ :div ["p-2"] "This is a random number from state: " state-random " (preserved by react-refresh), and on render: " (rand))))
 
 (def config
-  {:factor/context {}
-   ::react/render
-   {:target "root"
-    :component ExampleComponent}})
+  (merge
+   encoding/config sente/config sente-client/config
+   {:factor/context {}
+    ::sente-client/client-options
+    {:protocol :http
+     :host "localhost"
+     :port 9090
+     :path "/api"}
+    ::react/render
+    {:target "root"
+     :component ExampleComponent}}))
 
 (defmethod ig/init-key :factor/context [_ _] {})
 

@@ -1,7 +1,16 @@
 (ns factor.server.injection
   (:refer-clojure :exclude [ref])
-  (:require [integrant.core :as ig]
+  (:require [factor.system :as system]
+            [integrant.core :as ig]
             [methodical.core :as methodical]))
+
+(methodical/defmulti pre-init-spec (fn [key prev] (#'ig/normalize-key key)))
+(methodical/defmethod pre-init-spec :default [_ _])
+(defmethod system/pre-init-spec :default [key] (pre-init-spec key nil))
+
+(methodical/defmulti post-init-spec (fn [key prev] (#'ig/normalize-key key)))
+(methodical/defmethod post-init-spec :default [_ _])
+(defmethod system/post-init-spec :default [key] (post-init-spec key nil))
 
 (methodical/defmulti resolve-key (fn [key value prev] (#'ig/normalize-key key)))
 (methodical/defmethod resolve-key :default [_ v _] v)

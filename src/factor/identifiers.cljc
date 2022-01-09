@@ -5,6 +5,11 @@
 
 (ty/defn random-uuid
   "Generate a UUID in a cross-platform way."
-  [] [=> :error/id]
+  [] [=> :uuid]
   #?(:clj (UUID/randomUUID)
      :cljs (random-uuid)))
+
+(ty/defn read-uuid
+  [string] [:string => :uuid]
+  #?(:clj (UUID/fromString string)
+     :cljs (uuid string)))

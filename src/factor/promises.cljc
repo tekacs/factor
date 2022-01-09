@@ -4,11 +4,22 @@
   (:require [clojure.core.async :as y]
             [factor.async :as async]
             [factor.types :as ty :refer [=>]]
-            [helix.hooks :as hook]
+            #?(:cljs [helix.hooks :as hook])
             [promesa.core :as pc]))
 
 #?(:cljs (ty/def ::thenable [:fn pc/thenable?]))
 (ty/def ::promise [:fn pc/promise?])
+
+(defn terminate!?
+  "Handle both result and error cases of a promise and stop handling here. Returns nil."
+  [p% f err-f]
+  (pc/handle
+    p%
+    (fn [good bad]
+      (cond
+        good (f good)
+        bad  (err-f bad))))
+  nil)
 
 (ty/defn ^{:aave.core/enforce-purity false} channel->promise
   [ch] [::async/readable => ::promise]
