@@ -56,4 +56,10 @@
   com.fulcrologic.guardrails.core/>def   clojure.spec.alpha/def
   
   methodical.core/defmulti               clojure.core/defmulti
-  methodical.core/defmethod              clojure.core/defmethod}}
+  methodical.core/defmethod              clojure.core/defmethod
+  
+  com.rpl.specter/defcollector           clojure.core/defn
+  com.rpl.specter/defdynamicnav          clojure.core/defn
+  com.rpl.specter/defmacroalias          clojure.core/def
+  com.rpl.specter/defnav                 clojure.core/defn
+  com.rpl.specter/defrichnav             clojure.core/defn}}
