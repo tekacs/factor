@@ -2,6 +2,7 @@
   (:require [factor.client.react :as react]
             [factor.encoding :as encoding]
             [factor.environment]
+            [factor.pathom.client :as pathom-client]
             [factor.sente :as sente]
             [factor.sente.client :as sente-client]
             [factor.system :as system]
@@ -19,7 +20,7 @@
 
 (def config
   (merge
-   encoding/config sente/config sente-client/config
+   encoding/config sente/config sente-client/config pathom-client/config
    {:factor/context {}
     ::sente-client/client-options
     {:protocol :http

@@ -39,6 +39,6 @@
 (def config
   {[::plan-cache$ ::default] {}
    [::env ::default] {:plan-cache$ (ig/ref [::plan-cache$ ::default])
-                     :resolvers (ig/ref [::resolvers ::default])}
+                      :resolvers (ig/ref [::resolvers ::default])}
    [::boundary-interface ::default] {:env (ig/ref [::env ::default])}
    [::sente-handler ::default] {:boundary-interface (ig/ref [::boundary-interface ::default])}})
