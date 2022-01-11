@@ -23,7 +23,7 @@
    :factor.environment/profile :development
    
    [::pathom-server/resolvers ::pathom-server/default] [(pbir/constantly-fn-resolver ::now (fn [] (java.util.Date.)))]
-   ::sente-server/handle-event! {:dispatch-map {:default (injection/ref [::pathom-server/sente-handler ::pathom-server/default])}}
+   ::sente-server/handle-event! {:dispatch-map {:factor/default (injection/ref [::pathom-server/sente-handler ::pathom-server/default])}}
    ::routing/cors-configuration {:origins ["http://localhost:3000"]}))
 
 (defn -main []
