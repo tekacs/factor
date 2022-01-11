@@ -121,8 +121,8 @@
 (def config
   {::client {:packer (ig/ref ::sente/packer)
              :client-options (ig/ref ::client-options)}
-   ::handle-event$ {}
-   ::handler {:handle-event$ (ig/ref ::handle-event$)
+   ::handle-event! {}
+   ::handler {:handle-event! (ig/ref ::handle-event!)
               :client (ig/ref ::client)
               :context (ig/ref :factor/context)}
    ::sender {:client (ig/ref ::client)}
