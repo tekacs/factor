@@ -52,11 +52,14 @@
                         http-kit/http-kit              {:mvn/version "2.5.1"}
 
                         ring/ring-defaults             {:mvn/version "0.3.2"}
-                        com.cognitect/transit-clj      {:mvn/version "1.0.324"}
-                        metosin/muuntaja               {:mvn/version "0.6.7"}
                         ring/ring-core                 {:mvn/version "1.8.2"} ; For middleware
                         ring/ring-jetty-adapter        {:mvn/version "1.8.2"} ; For middleware
-                        ring-cors/ring-cors            {:mvn/version "0.1.13"}
+                        
+                        com.cognitect/transit-clj      {:mvn/version "1.0.324"}
+                        
+                        metosin/muuntaja               {:mvn/version "0.6.7"}
+
+                        zerg000000/simple-cors         {:mvn/version "0.0.8"}
 
                         amazonica/amazonica            {:mvn/version "0.3.153"}
 

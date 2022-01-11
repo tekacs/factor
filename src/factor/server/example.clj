@@ -24,7 +24,7 @@
    
    [::pathom-server/resolvers ::pathom-server/default] [(pbir/constantly-fn-resolver ::now (fn [] (java.util.Date.)))]
    ::sente-server/handle-event! {:dispatch-map {:default (injection/ref [::pathom-server/sente-handler ::pathom-server/default])}}
-   ::routing/cors-configuration {:origins [#"http://localhost:3000"]}))
+   ::routing/cors-configuration {:origins ["http://localhost:3000"]}))
 
 (defn -main []
   ;; There are a few configurations that the library consumer must set itself.

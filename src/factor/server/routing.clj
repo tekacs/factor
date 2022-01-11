@@ -4,14 +4,15 @@
             [methodical.core :as methodical]
             [reitit.dev.pretty :as pretty]
             [reitit.http :as http]
+            [reitit.http.interceptors.dev :as dev]
             [reitit.http.interceptors.exception :as exception]
             [reitit.http.interceptors.multipart :as multipart]
             [reitit.http.interceptors.muuntaja :as muuntaja]
             [reitit.http.interceptors.parameters :as parameters]
             [reitit.interceptor.sieppari :as sieppari]
             [reitit.ring :as ring]
-            [ring.middleware.cors :as cors]
-            [ring.middleware.keyword-params])
+            [ring.middleware.keyword-params]
+            [simple-cors.reitit.interceptor :as cors])
   (:import java.util.UUID))
 
 ;; TODO: Switch from aleph/reitit to bidi/yada?
@@ -21,7 +22,7 @@
 (methodical/defmethod injection/init-key ::exception-handlers [_ _ _]
   (assoc
    exception/default-handlers
-   
+
    ;; all exceptions are passed through here first -- it calls downstream handlers.
    ::exception/wrap
    (fn [handler ex request]
@@ -36,35 +37,6 @@
 (def keyword-params
   {:name  ::keyword-params
    :enter (fn [ctx] (update ctx :request ring.middleware.keyword-params/keyword-params-request))})
-
-(def cors-interceptor
-  {:name    ::cors
-   :compile (fn [{:keys [access-control]} _]
-              (when access-control
-                (let [access-control (cors/normalize-config (mapcat identity access-control))]
-                  {:enter (fn cors-interceptor-enter
-                            [{:keys [request] :as ctx}]
-                            (if (and (cors/preflight? request)
-                                     (cors/allow-request? request access-control))
-                              (let [resp (cors/add-access-control
-                                           request
-                                           access-control
-                                           cors/preflight-complete-response)]
-                                (assoc ctx
-                                       :response resp
-                                       :queue nil))
-                              ctx))
-                   :leave (fn cors-interceptor-leave
-                            [{:keys [request response] :as ctx}]
-                            (cond-> ctx
-                              (and (cors/origin request)
-                                   (cors/allow-request? request access-control)
-                                   response)
-                              (assoc :response
-                                     (cors/add-access-control
-                                       request
-                                       access-control
-                                       response))))})))})
 
 ;; endregion Middleware
 
@@ -85,41 +57,43 @@
    ["/api" {:get (handlers ::sente-get) :post (handlers ::sente-post)}]])
 
 (methodical/defmethod injection/init-key ::cors-configuration [_ {:keys [origins]} _]
-  {:access-control-allow-origin      origins
-   :access-control-allow-credentials "true"
-   :access-control-allow-methods     [:get :put :post :delete]
-   :access-control-allow-headers     ["content-type"
-                                      "authorization"
-                                      "x-csrf-token"
-                                      "x-requested-with"]})
+  {:cors-config {:origins origins
+                 :allow-credentials? true
+                 :max-age 300
+                 :allowed-request-methods [:get :put :post :delete]
+                 :allowed-request-headers ["content-type"
+                                           "authorization"
+                                           "x-csrf-token"
+                                           "x-requested-with"]}})
 
 (methodical/defmethod injection/init-key ::router [_ {:keys [routes muuntaja-instance cors-configuration exception-handlers]} _]
   (http/router
-    routes
-    {:exception pretty/exception
-     ;; :reitit.interceptor/transform dev/print-context-diffs
-     :data      {:muuntaja       muuntaja-instance
-                 :access-control cors-configuration
-                 :interceptors   [(parameters/parameters-interceptor)
-                                  keyword-params
-                                  (muuntaja/format-negotiate-interceptor)
-                                  (muuntaja/format-response-interceptor)
-                                  (exception/exception-interceptor exception-handlers)
-                                  (muuntaja/format-request-interceptor)
-                                  (multipart/multipart-interceptor)
-                                  cors-interceptor]}}))
+   routes
+   {:exception pretty/exception
+    ;; :reitit.interceptor/transform dev/print-context-diffs
+    :reitit.http/default-options-endpoint (cors/make-default-options-endpoint cors-configuration)
+    :data      {:muuntaja       muuntaja-instance
+                :access-control cors-configuration
+                :interceptors   [(parameters/parameters-interceptor)
+                                 keyword-params
+                                 (muuntaja/format-negotiate-interceptor)
+                                 (muuntaja/format-response-interceptor)
+                                 (exception/exception-interceptor exception-handlers)
+                                 (muuntaja/format-request-interceptor)
+                                 (multipart/multipart-interceptor)
+                                 (cors/cors-interceptor cors-configuration)]}}))
 
 (methodical/defmethod injection/init-key ::handle [_ {:keys [router]} _]
   (http/ring-handler
-    router
-    (ring/create-default-handler)
-    {:executor sieppari/executor}))
+   router
+   (ring/create-default-handler)
+   {:executor sieppari/executor}))
 
 (def config
   {;; XXX: This MUST be overridden by the user for production use.
    ;; Each origin should be a regex of the domain, as in the commented out example below.
    ::cors-configuration
-   {:origins [#_#"https://tekacs.com"]}
+   {:origins [#_"https://tekacs.com"]}
 
    ::exception-handlers
    {}
