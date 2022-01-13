@@ -1,5 +1,6 @@
 (ns factor.client.example
   (:require [factor.client.react :as react]
+            [factor.client.routing :as client-routing]
             [factor.encoding :as encoding]
             [factor.environment]
             [factor.pathom.client :as pathom-client]
@@ -20,7 +21,7 @@
 
 (def config
   (merge
-   encoding/config sente/config sente-client/config pathom-client/config
+   encoding/config sente/config sente-client/config pathom-client/config client-routing/config
    {:factor/context {}
     ::sente-client/client-options
     {:protocol :http
@@ -29,7 +30,9 @@
      :path "/api"}
     ::react/render
     {:target "root"
-     :component ExampleComponent}}))
+     :component ExampleComponent}
+    ::client-routing/routes
+    [["/" ::home]]}))
 
 (defmethod ig/init-key :factor/context [_ _] {})
 
