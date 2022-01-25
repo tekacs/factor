@@ -1,11 +1,16 @@
 (ns factor.encoding
   "Support for encoding, based on Transit"
-  (:require [cognitect.transit :as transit]
+  (:require #?(:cljs [com.cognitect.transit.types :as transit-types])
+            [cognitect.transit :as transit]
             [com.wsscode.pathom3.connect.operation.transit :as pcot]
             [factor.time :as time]
             [factor.types :as ty]
             #?(:clj [muuntaja.core :as muuntaja])
             [integrant.core :as ig]))
+
+#?(:cljs
+   ;; This is necessary to ensure that cljs.core/uuid? recognizes Transit UUIDs.
+   (extend-type transit-types/UUID IUUID))
 
 (ty/def ::codec
   [:map

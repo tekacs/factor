@@ -9,30 +9,24 @@
             [factor.types :as ty]
             [helix.children :as helix-children]
             [helix.core]
-            [helix.experimental.refresh :as refresh]
             [helix.hooks :as hook]
             [integrant.core :as ig]
             [promesa.core :as pc]
             [shadow.lazy :as lazy])
   (:require-macros [factor.client.react :refer [$ defnc prop]]))
 
-(declare $ render! unmount! refresh!)
+(declare $ render! unmount!)
 
 (defmethod ig/init-key ::render [_ {:keys [target component]}]
   (let [root (dom/get-element-by-id target)]
     (render! root ($ component))
     root))
 
-(defmethod ig/suspend-key! ::render [_ st]
-  st)
-
-(defmethod ig/resume-key ::render [_ _ _ st]
-  ;; NOTE: This implementation does NOT respect changes to config -- it just does a hot reload.
-  (refresh!)
-  st)
-
 (defmethod ig/halt-key! ::render [_ root]
   (unmount! root))
+
+;; ::render's suspend and resume are defined in factor.client.preload
+;; f.c.preload is only loaded in dev, by devtools config, so prevents react-refresh in production
 
 (ty/def ::element
   [:fn {:error/message "Should have a $$typeof field, which matches Symbol.for(\"react.element\")"}
@@ -49,12 +43,6 @@
 
 (defn unmount! [root]
   (a/call! react-dom :unmountComponentAtNode root))
-
-(defn refresh! []
-  (let [log (a/get js/console :log)]
-    (a/assoc! js/console :log (constantly nil))
-    (refresh/refresh!)
-    (a/assoc! js/console :log log)))
 
 (defn lazy* [loadable]
   (react/lazy
