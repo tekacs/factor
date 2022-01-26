@@ -1,6 +1,10 @@
 (ns factor.client.dom
   (:require [com.tekacs.access :as a]))
 
+(defn set-title!
+  [title]
+  (a/assoc! js/document :title title))
+
 (defn get-element-by-id [id]
   (a/document! :getElementById id))
 
