@@ -5,7 +5,8 @@
             [integrant.core :as ig]
             [lentes.core :as lentes]
             [malli.core :as m]
-            [malli.error :as me]))
+            [malli.error :as me]
+            #?(:clj [taoensso.timbre :as timbre])))
 
 ;; TODO: Use this to validate, as is done in integrant. Not done yet because it requires overriding `ig/init` and `ig/resume`, which I'm not sure I want to do.
 ;; Taken from https://github.com/weavejester/integrant/blob/32a46f5dca8a6b563a6dddf88bec887be3201b08/src/integrant/core.cljc#L405
@@ -160,19 +161,31 @@
       :resumed)
     (throw (prep-error))))
 
+#?(:clj
+   (defn ns-refresh [& args]
+     (let [result (apply tnr/refresh args)]
+       (when-not (keyword? result)
+         (timbre/error result)))))
+
+#?(:clj
+   (defn ns-refresh-all [& args]
+     (let [result (apply tnr/refresh-all args)]
+       (when-not (keyword? result)
+         (timbre/error result)))))
+
 (defn reset []
   (suspend)
-  #?(:clj (tnr/refresh :after 'factor.system/resume)
+  #?(:clj (ns-refresh :after 'factor.system/resume)
      :cljs (resume)))
 
 (defn reset-all []
   (suspend)
-  #?(:clj (tnr/refresh-all :after 'factor.system/resume)
+  #?(:clj (ns-refresh-all :after 'factor.system/resume)
      :cljs (resume)))
 
 (defn hard-reset []
   (halt)
-  #?(:clj (do (tnr/clear) (tnr/refresh-all :after 'factor.system/go))
+  #?(:clj (do (tnr/clear) (ns-refresh-all :after 'factor.system/go))
      :cljs (go)))
 
 (defn load-namespaces []
