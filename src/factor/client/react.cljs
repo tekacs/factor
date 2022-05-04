@@ -6,11 +6,13 @@
             [factor.client.dom :as dom]
             [factor.client.types :as fct]
             [factor.debugging]
+            [factor.system.state :as state]
             [factor.types :as ty]
             [helix.children :as helix-children]
             [helix.core]
             [helix.hooks :as hook]
             [integrant.core :as ig]
+            [lentes.core :as lentes]
             [promesa.core :as pc]
             [shadow.lazy :as lazy])
   (:require-macros [factor.client.react :refer [$ defnc prop]]))
@@ -86,3 +88,7 @@
          (add-watch atom' key #(set-state %4))
          #(do (remove-watch atom' key) (when cleanup (cleanup))))))
     state))
+
+(defn use-system-key [system-path]
+  (let [narrow-state$ (lentes/derive (lentes/in system-path) state/system$)]
+    (use-atom narrow-state$)))
