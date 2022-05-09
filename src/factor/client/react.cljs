@@ -13,6 +13,8 @@
             [helix.hooks :as hook]
             [integrant.core :as ig]
             [lentes.core :as lentes]
+            [malli.core]
+            [malli.error]
             [promesa.core :as pc]
             [shadow.lazy :as lazy])
   (:require-macros [factor.client.react :refer [$ defnc prop]]))

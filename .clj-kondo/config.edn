@@ -41,7 +41,7 @@
   
   factor.client.react/defnc              clojure.core/defn
   
-  foundation.hooks/defcontext            clojure.core/def
+  factor.client.react/defcontext         clojure.core/def
   
   foundation.icons/deficon               clojure.core/def
   

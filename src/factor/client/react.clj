@@ -135,3 +135,24 @@
 
 (defmacro lazy [component-sym]
   `(factor.client.react/lazy* (shadow.lazy/loadable ~component-sym)))
+
+(defmacro defcontext [hook-name schema]
+  (when-not (string/starts-with? (name hook-name) "use-")
+    (throw (ex-info
+             "defcontext takes a hook name, which must start with use-"
+             {:actual hook-name :expected "use-.*"})))
+  (let [ctx-name#       (symbol (str (name hook-name) "-ctx"))
+        validator-name# (symbol (str (name hook-name) "-validate$"))]
+    `(do
+       (def ~validator-name# (delay (malli.core/validator ~schema)))
+       (def ~ctx-name# (com.tekacs.access/call! (helix.core/get-react) :createContext nil))
+       (defn ~hook-name
+         ([] (helix.hooks/use-context ~ctx-name#))
+         ([value# children#]
+          (when-not (@~validator-name# value#)
+            (throw (ex-info "React context value failed schema validation"
+                            {:hook-name '~hook-name
+                             :explain   (malli.error/humanize (malli.core/explain ~schema value#))
+                             :expected  ~schema
+                             :actual    value#})))
+          (helix.core/provider {:context ~ctx-name# :value value#} children#))))))

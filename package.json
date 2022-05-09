@@ -24,6 +24,7 @@
     "@js-joda/locale_en-us": "3.1.1",
     "@js-joda/timezone": "2.5.0",
     "detect-browser": "^5.3.0",
+    "mousetrap": "^1.6.5",
     "randexp": "^0.5.3",
     "random-seed": "^0.3.0",
     "react": "^16.13.1",
