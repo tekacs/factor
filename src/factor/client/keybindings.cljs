@@ -11,6 +11,9 @@
             [lentes.core :as lentes]
             [taoensso.timbre :as timbre]))
 
+;; We deal with handling stopCallback ourselves, so ensure that all events make it to us.
+(a/assoc-in! Mousetrap [:prototype :stopCallback] (constantly false))
+
 (ty/def ::binding-root
   ;; {scope => root}
   [:map-of :string :string])
