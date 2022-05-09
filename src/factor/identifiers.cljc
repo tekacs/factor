@@ -7,7 +7,7 @@
   "Generate a UUID in a cross-platform way."
   [] [=> :uuid]
   #?(:clj (UUID/randomUUID)
-     :cljs (random-uuid)))
+     :cljs (cljs.core/random-uuid)))
 
 (ty/defn read-uuid
   [string] [:string => :uuid]
