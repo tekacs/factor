@@ -166,3 +166,7 @@
                :pred            #(isa? % parent)
                :min             1
                :max             1})))
+
+(register! ::atom [:fn {:error/message "should be an atom"}
+                   #?(:clj (partial instance? clojure.lang.Atom)
+                      :cljs #(satisfies? cljs.core/IAtom %))])
