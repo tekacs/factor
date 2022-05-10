@@ -1,17 +1,16 @@
 (ns factor.client.react.errors
   {:client/npm-deps ["react-error-boundary"]}
   (:require ["react-error-boundary" :refer [ErrorBoundary] :rename {ErrorBoundary REB}]
-            [factor.debugging :as debugging]
-            [factor.errors :as errors]
-            [factor.client.react :refer [$ defnc prop]]))
+            [factor.client.react :refer [$ defnc prop] :as react]
+            [factor.debugging :as debugging]))
 
 (prop ErrorFallback [:map
-                     [:error ::errors/error]
-                     [:componentStack ::child]
+                     [:error :any]
+                     [:componentStack ::react/child]
                      [:resetErrorBoundary ifn?]])
 (defnc ErrorFallback [{:keys [error componentStack resetErrorBoundary]}]
   (js/console.log error)
-  ($ :div ["p-2-safe flex flex-col"]
+  ($ :div ["p-2 flex flex-col"]
      ($ :a {:on-click resetErrorBoundary} "Reset")
      ($ :br)
      ($ :div
