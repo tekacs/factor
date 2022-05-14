@@ -12,6 +12,11 @@
   [value] [any? => nil?]
   (println (fprint-str value)))
 
+(defn log
+  [& args]
+  #?(:clj (fprint `[~@args])
+     :cljs (apply js/console.log args)))
+
 #?(:cljs
    (defn log-group
      [_level title & args]
