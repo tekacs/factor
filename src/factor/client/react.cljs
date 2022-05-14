@@ -39,6 +39,9 @@
 (ty/def ::child
   [:or string? ::element [:sequential [:ref ::child]] ifn?])
 
+(ty/def ::ref
+  (ty/mapped-type ::ref (fn [_ [child-type] _] [::fct/js-obj [:current {:optional true} [:maybe child-type]]])))
+
 (defmulti props-spec (fn [type_] type_))
 (defmulti props-explainer (fn [type_] type_))
 
