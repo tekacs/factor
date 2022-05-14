@@ -127,12 +127,12 @@
         (a/call! instance :bind key (wrapped-key-handler handler condition))
         #(a/call! instance :unbind key))))))
 
-(defn use-keyboard-selection [bind-root items]
+(defn use-keyboard-selection [scope can-clear? items]
   (let [[selected set-selected] (hook/use-state nil)
         prev!                   (hook/use-callback [items set-selected] #(set-selected (fn [sel] (collections/last-before #{sel} items))))
         next!                   (hook/use-callback [items set-selected] #(set-selected (fn [sel] (collections/first-after #{sel} items))))
         clear!                  (hook/use-callback [set-selected] #(set-selected nil))]
-    (use-binding bind-root "up" prev!)
-    (use-binding bind-root "down" next!)
-    (use-binding bind-root "escape" clear!)
+    (use-global-binding scope "up" prev!)
+    (use-global-binding scope "down" next!)
+    (when can-clear? (use-global-binding scope "escape" clear!))
     selected))
