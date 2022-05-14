@@ -76,3 +76,18 @@
   (->> read-write/tags
        (map (fn [[sym fun]] [(str "time/" (name sym)) (transit/read-handler fun)]))
        (into {})))
+
+(defn since-unix-epoch
+  ([] (since-unix-epoch (tick/now)))
+  ([upto]
+   (tick/between (tick/epoch) upto)))
+
+(defn millis-since-unix-epoch
+  ([] (millis-since-unix-epoch (tick/now)))
+  ([upto]
+   (tick/millis (since-unix-epoch upto))))
+
+(defn seconds-since-unix-epoch
+  ([] (seconds-since-unix-epoch (tick/now)))
+  ([upto]
+   (tick/seconds (since-unix-epoch upto))))
