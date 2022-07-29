@@ -1,7 +1,6 @@
 (ns factor.client.example
   (:require [factor.client.react :as react]
             [factor.client.routing :as client-routing]
-            [factor.client.zustand :as zustand]
             [factor.encoding :as encoding]
             [factor.environment]
             [factor.pathom.client :as pathom-client]
