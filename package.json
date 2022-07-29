@@ -31,7 +31,7 @@
     "react-dom": "^16.13.1",
     "react-error-boundary": "^3.1.4",
     "react-refresh": "^0.8.1",
-    "shadow-cljs": "^2.16.12",
+    "shadow-cljs": "^2.19.8",
     "yjs": "^13.5.36",
     "zustand": "^4.0.0-rc.1"
   }

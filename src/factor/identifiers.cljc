@@ -1,5 +1,6 @@
 (ns factor.identifiers
-  #?(:cljs (:refer-clojure :exclude [random-uuid]))
+  #?(:clj (:refer-clojure :exclude [random-uuid])
+     :cljs (:refer-clojure :exclude [random-uuid]))
   #?(:clj (:import (java.util UUID)))
   (:require [factor.types :as ty :refer [=>]]))
 

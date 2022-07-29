@@ -32,32 +32,30 @@
 
  :lint-as
  {factor.examples/defexample             clojure.core/def
-  
+
   factor.types/def                       clojure.spec.alpha/def
   factor.types/defn                      clojure.core/defn
   factor.types/defn-                     clojure.core/defn-
-  
+
   factor.client.defcards/defcard         clj-kondo.lint-as/def-catch-all
-  
+
   factor.client.react/defnc              clojure.core/defn
-  
+
   factor.client.react/defcontext         clojure.core/def
-  
+
   foundation.icons/deficon               clojure.core/def
-  
-  helix.core/defnc                       clojure.core/defn
 
   promesa.core/let                       clojure.core/let
-  
+
   com.wsscode.pathom.connect/defresolver clojure.core/defn
   com.wsscode.pathom.connect/defmutation clojure.core/defn
-  
+
   com.fulcrologic.guardrails.core/>defn  clojure.core/defn
   com.fulcrologic.guardrails.core/>def   clojure.spec.alpha/def
-  
+
   methodical.core/defmulti               clojure.core/defmulti
   methodical.core/defmethod              clojure.core/defmethod
-  
+
   com.rpl.specter/defcollector           clojure.core/defn
   com.rpl.specter/defdynamicnav          clojure.core/defn
   com.rpl.specter/defmacroalias          clojure.core/def

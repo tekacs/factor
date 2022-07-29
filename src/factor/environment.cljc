@@ -1,6 +1,5 @@
 (ns factor.environment
-  (:require #?(:cljs [aero.core :as aero])
-            #?(:cljs [clojure.string :as string])
+  (:require #?(:cljs [clojure.string :as string])
             [factor.types :as ty]
             [integrant.core :as ig]))
 
@@ -8,9 +7,7 @@
   [:enum :development :test :production])
 
 (defmethod ig/prep-key ::profile [_ profile]
-  (or
-   profile
-   #?(:clj nil :cljs (some-> (aero/get-env "NODE_ENV") string/lower-case keyword))))
+  profile)
 
 (defmethod ig/init-key ::profile [_ profile]
   (ty/assert-valid ::profile (str "Started with an invalid " ::profile) profile))

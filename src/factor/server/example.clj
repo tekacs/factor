@@ -21,7 +21,7 @@
    (merge repl/config encoding/config pathom-server/config sente/config sente-http/config sente-server/config routing/config http/config)
    :factor/context {:nrepl-server (injection/ref ::repl/nrepl-server)}
    :factor.environment/profile :development
-   
+
    [::pathom-server/resolvers ::pathom-server/default] [(pbir/constantly-fn-resolver ::now (fn [_] (java.util.Date.)))]
    ::sente-server/handle-event! {:dispatch-map {:factor/default (injection/ref [::pathom-server/sente-handler ::pathom-server/default])}}
    ::routing/cors-configuration {:origins ["http://localhost:3000"]}))
@@ -29,7 +29,7 @@
 (defn -main []
   ;; There are a few configurations that the library consumer must set itself.
   ;; - `:factor/context` should be overridden as above and therefore should use whatever config is appropriate.
-  ;; - `:factor.environment/profile` should be set to `:development`, `:production` or `:test` -- it will be set from `NODE_ENV` in ClojureScript
+  ;; - `:factor.environment/profile` should be set to `:development`, `:production` or `:test`
   ;; - `:factor.server.routing/cors-configuration` should be set to a list of regexes of accepted CORS Origins.
   (system/set-prep! (fn [] (#'config)))
 

@@ -13,8 +13,7 @@
             [malli.generator :as mg]
             [malli.impl.util :as miu]
             [malli.registry :as mr]
-            [malli.util :as mu])
-  #?(:clj (:import (clojure.lang IAtom))))
+            [malli.util :as mu]))
 
 (def => :ret)
 
@@ -76,7 +75,7 @@
            (-options [this] options)
            (-children [this] children)
            (-parent [this] (mapped-type type mapper))
-           (-form [this] (m/-create-form type properties children))))))))
+           (-form [this] (m/-create-form type properties children options))))))))
 
 (clojure.core/defn safe-mapper
   [f]
@@ -107,7 +106,7 @@
               (fn explain [x in acc]
                 (let [mapped (mapper x)]
                   (if (= mapped ::invalid)
-                    (conj acc (miu/->SchemaError path in this x ::mapper-failed "mapper failed"))
+                    (conj acc (miu/-error path in this x ::mapper-failed))
                     (underlying-explainer mapped in acc))))))
           (-parser [this] (comp (m/-parser underlying-type) mapper))
           (-unparser [this] (comp gen-mapper (m/-unparser underlying-type)))
@@ -121,7 +120,7 @@
           (-options [this] options)
           (-children [this] children)
           (-parent [this] (transform-type type mapper gen-mapper underlying-type))
-          (-form [this] (m/-create-form type properties children)))))))
+          (-form [this] (m/-create-form type properties children options)))))))
 
 (def registry
   (mr/composite-registry

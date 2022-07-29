@@ -1,5 +1,6 @@
 (ns factor.client.example
-  (:require [factor.client.react :as react]
+  (:require [factor.client.config :as config]
+            [factor.client.react :as react]
             [factor.client.routing :as client-routing]
             [factor.encoding :as encoding]
             [factor.environment]
@@ -26,7 +27,7 @@
     ::sente-client/client-options
     {:protocol :http
      :host "localhost"
-     :port 9090
+     :port (js/Number.parseInt config/PORT)
      :path "/api"}
     ::react/render
     {:target "root"

@@ -33,7 +33,8 @@
                       :infer-externs  :auto}
    :module-loader    true
    :modules          {:factor {:entries [factor.client.example]}}
-   :closure-defines  {malli.registry/type "custom"}
+   :closure-defines  {malli.registry/type "custom"
+                      factor.client.config/PORT #shadow/env "PORT"}
    :js-options       {;; Fix for https://github.com/thheller/shadow-cljs/issues/854
                       :babel-preset-config {:targets {:chrome 80}}}
    :dev              {:compiler-options {:output-feature-set :es8

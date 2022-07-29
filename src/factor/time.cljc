@@ -2,7 +2,7 @@
   "Date and Time based on juxt/tick, as well as types for CLJ+S"
   (:require [cognitect.transit :as transit]
             [factor.types :as ty]
-            [tick.alpha.api :as tick]
+            [tick.core :as tick]
             [tick.locale-en-us]
             #?(:cljs [java.time :refer [Period
                                         LocalDate
