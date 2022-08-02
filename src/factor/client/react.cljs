@@ -85,15 +85,17 @@
 
 ;; TODO: Switch to use-subscription
 (defn use-atom [atom' & {:keys [cleanup]}]
-  (let [[state set-state] (hook/use-state (when atom' @atom'))]
+  (let [[state set-state] (hook/use-state (fn [] (when atom' @atom')))]
     (hook/use-effect
      [atom' set-state]
      (when atom'
        (let [key (-> :use-atom gensym name)]
-         (add-watch atom' key #(set-state %4))
+         (add-watch atom' key #(set-state (fn [] %4)))
          #(do (remove-watch atom' key) (when cleanup (cleanup))))))
     state))
 
 (defn use-system-key [system-path]
-  (let [narrow-state$ (lentes/derive (lentes/in system-path) state/system$)]
+  (let [key-cache$ (::use-system-key-cache$ (swap! state/system$ update ::use-system-key-cache$ #(or % (atom {}))))
+        system-path (equality-cached key-cache$ system-path)
+        narrow-state$ (hook/use-memo [system-path state/system$] (lentes/derive (lentes/in system-path) state/system$))]
     (use-atom narrow-state$)))
