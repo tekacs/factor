@@ -17,13 +17,15 @@
             [malli.error]
             [promesa.core :as pc]
             [shadow.lazy :as lazy])
-  (:require-macros [factor.client.react :refer [$ defnc prop]]))
+  (:require-macros [factor.client.react :refer [$ defnc prop defcontext]]))
 
 (declare $ render! unmount!)
 
-(defmethod ig/init-key ::render [_ {:keys [target component]}]
+(defcontext use-system-context :any)
+
+(defmethod ig/init-key ::render [_ {:keys [target component system-context]}]
   (let [root (dom/get-element-by-id target)]
-    (render! root ($ component))
+    (render! root (use-system-context system-context ($ component)))
     root))
 
 (defmethod ig/halt-key! ::render [_ root]
@@ -83,19 +85,24 @@
       (swap! cache-atom$ assoc value value)
       value)))
 
+(defn use-equality-cached
+  [value]
+  (let [cache-ref$ (hook/use-ref {})]
+    (equality-cached cache-ref$ value)))
+
 ;; TODO: Switch to use-subscription
 (defn use-atom [atom' & {:keys [cleanup]}]
   (let [[state set-state] (hook/use-state (fn [] (when atom' @atom')))]
     (hook/use-effect
      [atom' set-state]
      (when atom'
+       (set-state (fn [] @atom'))
        (let [key (-> :use-atom gensym name)]
-         (add-watch atom' key #(set-state (fn [] %4)))
+         (add-watch atom' key #(set-state %4))
          #(do (remove-watch atom' key) (when cleanup (cleanup))))))
     state))
 
 (defn use-system-key [system-path]
-  (let [key-cache$ (::use-system-key-cache$ (swap! state/system$ update ::use-system-key-cache$ #(or % (atom {}))))
-        system-path (equality-cached key-cache$ system-path)
-        narrow-state$ (hook/use-memo [system-path state/system$] (lentes/derive (lentes/in system-path) state/system$))]
-    (use-atom narrow-state$)))
+  (let [system-context (use-system-context)
+        system-path (use-equality-cached system-path)]
+    (hook/use-memo [system-context system-path] (get-in system-context system-path))))

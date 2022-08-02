@@ -31,7 +31,8 @@
      :path "/api"}
     ::react/render
     {:target "root"
-     :component ExampleComponent}
+     :component ExampleComponent
+     :system-context {::pathom-client/send! (ig/ref ::pathom-client/send!)}}
     ::client-routing/routes
     [["/" ::home]]}))
 
