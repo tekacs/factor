@@ -1,8 +1,8 @@
 (ns factor.babashka.build.init
   (:require [babashka.fs :as fs]
             [babashka.tasks :refer [clojure shell]]
-            [factor.babashka.build.assemble :refer [commit-revision]]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [factor.babashka.build.assemble :refer [commit-revision]]))
 
 (defn fetch-safe
   [m]
@@ -40,9 +40,8 @@
 
      :server/dev
      '{:deps
-       {nrepl/nrepl        {:mvn/version "0.8.3"}
-        com.billpiel/sayid {:mvn/version "0.1.0"}
-        cider/cider-nrepl  {:mvn/version "0.26.0"}}
+       {nrepl/nrepl        {:mvn/version "0.9.0"}
+        cider/cider-nrepl  {:mvn/version "0.28.5"}}
        :aliases
        {:cider/nrepl
         {:main-opts
