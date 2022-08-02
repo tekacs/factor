@@ -26,21 +26,20 @@
             [promesa.core :as pc]
             [taoensso.timbre :as timbre]))
 
-(defmethod system/pre-init-spec ::sente-client [_]
+(defmethod system/pre-init-spec ::send! [_]
   [:map
    [:sente-send! [:=> [:cat ::pathom/request ifn?] :any]]
    [:lenient-mode? {:optional true} [:maybe :boolean]]])
 
-(defmethod ig/prep-key ::sente-client [_ config]
+(defmethod ig/prep-key ::send! [_ config]
   ;; #(and false true) => false, to allow this to be set to false
   (update config :lenient-mode? (some-fn nil? true?)))
 
-(defmethod ig/init-key ::sente-client [_ {:keys [sente-send! lenient-mode?]}]
-  {:send!
-   (fn send! [[channel entity query] reply-fn]
-     (let [body (if (m/validate ::pathom/ast query) {:pathom/ast query} {:pathom/eql query})
-           body (assoc body :pathom/entity entity :pathom/lenient-mode? lenient-mode?)]
-       (sente-send! channel body reply-fn)))})
+(defmethod ig/init-key ::send! [_ {:keys [sente-send! lenient-mode?]}]
+  (fn send! [[channel entity query] reply-fn]
+    (let [body (if (m/validate ::pathom/ast query) {:pathom/ast query} {:pathom/eql query})
+          body (assoc body :pathom/entity entity :pathom/lenient-mode? lenient-mode?)]
+      (sente-send! channel body reply-fn))))
 
 (def config
-  {::sente-client {:sente-send! (ig/ref :factor.sente.client/send!)}})
+  {::send! {:sente-send! (ig/ref :factor.sente.client/send!)}})
