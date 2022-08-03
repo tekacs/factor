@@ -128,7 +128,8 @@
 
 (defn clj-run! [arguments-key]
   (let [args (arguments arguments-key)
-        args (flatten ["-J-Dmalli.registry/type=custom" "-J-XX:+UseG1GC" args])]
+        args (flatten ["-J-Dmalli.registry/type=custom" "-J-XX:+UseG1GC" args])
+        args (apply pass-args args)]
     (print (str "$ clojure " (str/join " " args) "\n"))
     (flush)
     (apply clojure args)))
