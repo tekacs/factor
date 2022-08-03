@@ -42,46 +42,45 @@
 
         methodical/methodical          {:mvn/version "0.12.4"}
 
-        hiccup/hiccup                  {:mvn/version "1.0.5"}}
+        hiccup/hiccup                  {:mvn/version "1.0.5"}
+
+        ;; SERVER DEPS
+        integrant/repl {:mvn/version "0.3.2"}
+
+        http-kit/http-kit {:mvn/version "2.6.0"}
+
+        ring/ring-defaults      {:mvn/version "0.3.3"}
+        ring/ring-core          {:mvn/version "1.9.5"} ; For middleware
+        ring/ring-jetty-adapter {:mvn/version "1.9.5"} ; For middleware
+
+        com.cognitect/transit-clj {:mvn/version "1.0.329"}
+
+        metosin/muuntaja {:mvn/version "0.6.8"}
+
+        zerg000000/simple-cors {:mvn/version "0.0.8"}
+
+        amazonica/amazonica {:mvn/version "0.3.161"}
+
+        ch.qos.logback/logback-classic {:mvn/version "1.2.11"}
+
+        ;; CLIENT DEPS
+        org.clojure/clojurescript {:mvn/version "1.11.60"}
+
+        org.rksm/suitable {:mvn/version "0.4.1"}
+
+        com.tekacs/access {:mvn/version "1.0.2"}
+
+        thheller/shadow-cljs {:mvn/version "2.19.8"}
+
+        binaryage/devtools {:mvn/version "1.0.6"}
+
+        cljs-bean/cljs-bean {:mvn/version "1.8.0"}
+
+        lilactown/helix {:mvn/version "0.1.6"}}
+
+ :jvm-opts ["-Dmalli.registry/type=custom"]
 
  :aliases
  {:http {:main-opts ["-m" "http"]}
-
-  :server {:extra-deps {integrant/repl                 {:mvn/version "0.3.2"}
-
-                        http-kit/http-kit              {:mvn/version "2.6.0"}
-
-                        ring/ring-defaults             {:mvn/version "0.3.3"}
-                        ring/ring-core                 {:mvn/version "1.9.5"} ; For middleware
-                        ring/ring-jetty-adapter        {:mvn/version "1.9.5"} ; For middleware
-
-                        com.cognitect/transit-clj      {:mvn/version "1.0.329"}
-
-                        metosin/muuntaja               {:mvn/version "0.6.8"}
-
-                        zerg000000/simple-cors         {:mvn/version "0.0.8"}
-
-                        amazonica/amazonica            {:mvn/version "0.3.161"}
-
-                        ch.qos.logback/logback-classic {:mvn/version "1.2.11"}}
-           :jvm-opts ["-Dmalli.registry/type=custom"]}
-
   :example-server {:main-opts ["-m" "factor.server.example"]}
-
-  :client {:extra-deps {org.clojure/clojurescript  {:mvn/version "1.11.60"}
-
-                        org.rksm/suitable          {:mvn/version "0.4.1"}
-
-                        com.tekacs/access          {:mvn/version "1.0.2"}
-
-                        thheller/shadow-cljs       {:mvn/version "2.19.8"}
-
-                        binaryage/devtools         {:mvn/version "1.0.6"}
-
-                        cljs-bean/cljs-bean        {:mvn/version "1.8.0"}
-
-                        lilactown/helix            {:mvn/version "0.1.6"}}
-           :jvm-opts ["-Dmalli.registry/type=custom"]}
-
-  :example-client
-  {:main-opts ["-m" "shadow.cljs.devtools.cli" "watch" ":example"]}}}
+  :example-client {:main-opts ["-m" "shadow.cljs.devtools.cli" "watch" ":example"]}}}
