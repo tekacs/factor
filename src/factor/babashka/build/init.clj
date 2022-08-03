@@ -38,7 +38,7 @@
           :closure-defines  {'factor.client.config/REVISION revision
                              'factor.client.config/VERSION  version}}))
 
-     :server/dev
+     :server.dev/repl
      '{:deps
        {nrepl/nrepl        {:mvn/version "0.9.0"}
         cider/cider-nrepl  {:mvn/version "0.28.5"}}
@@ -74,6 +74,7 @@
 
 (def arguments
   (let [server-kaocha-default [(str (aliases :server/release) ":server-test") "-m" "kaocha.runner"]
+        jvm-opts              "-J-XX:-OmitStackTraceInFastThrow"
         shadow-release-opt    (fn [optimizations]
                                 [(aliases :shadow/release)
                                  "release" "default"
@@ -81,9 +82,8 @@
                                  "--config-merge" (pr-str ((config :shadow/release) optimizations))])]
     (fetch-safe
       {:server/deps           ["-P" (aliases :server/release)]
-       :server.dev/repl       ["-J-XX:-OmitStackTraceInFastThrow"
-                               "-Sdeps" (pr-str (config :server/dev))
-                               (aliases :server.dev/repl)]
+       :server/dev            [jvm-opts (aliases :server/dev)]
+       :server.dev/repl       [jvm-opts "-Sdeps" (pr-str (config :server.dev/repl)) (aliases :server.dev/repl)]
        :server/release        [(aliases :server/release)]
        :server.kaocha/default server-kaocha-default
        :server.kaocha/verbose (into server-kaocha-default ["--reporter" "kaocha.report/documentation"])
