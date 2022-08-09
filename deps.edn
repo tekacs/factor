@@ -63,6 +63,8 @@
 
         ch.qos.logback/logback-classic {:mvn/version "1.2.11"}
 
+        io.nats/jnats {:mvn/version "2.15.6"}
+
         ;; CLIENT DEPS
         org.clojure/clojurescript {:mvn/version "1.11.60"}
 
