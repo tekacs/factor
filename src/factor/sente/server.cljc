@@ -5,6 +5,7 @@
             [factor.identifiers :as identifiers]
             [factor.multimethods :as multimethods]
             [factor.sente :as sente]
+            [factor.types :as ty :refer [=>]]
             [integrant.core :as ig]
             [taoensso.sente :as sente-core]
             [taoensso.timbre :as timbre]))
@@ -71,3 +72,8 @@
    {:handle-event! (ig/ref ::handle-event!)
     :server  (ig/ref ::server)
     :context (ig/ref :factor/context)}})
+
+(ty/defn handle-event%!
+  [ctx channel msg] [:map :keyword :any => ifn?]
+  (let [handle-event! (get ctx ::handle-event!)]
+    (handle-event! ctx {:event [channel msg]})))

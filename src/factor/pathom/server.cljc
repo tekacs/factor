@@ -15,12 +15,15 @@
             [com.wsscode.pathom3.interface.smart-map :as psm]
             [com.wsscode.pathom3.path :as p.path]
             [com.wsscode.pathom3.plugin :as p.plugin]
-            [integrant.core :as ig]))
+            [integrant.core :as ig]
+            [factor.keywords :as keywords]
+            [factor.pathom :as pathom]
+            [factor.types :as ty :refer [=>]]))
 
 ;; Based on https://pathom3.wsscode.com/docs/tutorials/serverless-pathom-gcf/
 
-(defmethod ig/init-key ::resolvers [_ resolvers]
-  resolvers)
+(defmethod ig/init-key ::resolvers [_ resolvers-fn]
+  (resolvers-fn))
 
 (defmethod ig/init-key ::plan-cache$ [_ _]
   ;; TODO: Switch to an LRU cache, like https://pathom3.wsscode.com/docs/cache/#using-corecache
@@ -42,3 +45,11 @@
                       :resolvers (ig/ref [::resolvers ::default])}
    [::boundary-interface ::default] {:env (ig/ref [::env ::default])}
    [::sente-handler ::default] {:boundary-interface (ig/ref [::boundary-interface ::default])}})
+
+(ty/defn boundary-interface%
+  [ctx instance-kwd] [:map :keyword => ifn?]
+  (get ctx [::boundary-interface (keywords/namespace-under-current-namespace instance-kwd)]))
+
+(ty/defn call%
+  [ctx instance-kwd entity eql] [:map :keyword :any ::pathom/eql => :any]
+  ((boundary-interface% ctx instance-kwd) {:pathom/entity entity :pathom/eql eql}))
