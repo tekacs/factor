@@ -38,3 +38,9 @@
     #(nil? (namespace %))]
    [:fn {:error/message "keyword should have a non-empty name"}
     #(not-empty (name %))]])
+
+(defmacro namespace-under-current-namespace
+  [kwd]
+  `(if (nil? (namespace ~kwd))
+     (keyword (str ~*ns*) (name ~kwd))
+     ~kwd))
