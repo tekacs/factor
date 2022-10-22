@@ -12,6 +12,7 @@
         com.wsscode/pathom3            {:mvn/version "2022.07.08-alpha"}
 
         com.xtdb/xtdb-core             {:mvn/version "1.21.0.1"}
+        com.xtdb/xtdb-rocksdb          {:mvn/version "1.21.0.1"}
         com.xtdb/xtdb-http-server      {:mvn/version "1.21.0.1"}
         com.xtdb/xtdb-http-client      {:mvn/version "1.21.0.1"}
 
